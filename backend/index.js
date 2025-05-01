@@ -42,7 +42,7 @@ const limiter = rateLimit({
 app.use('/api/', limiter);
 
 // 🌐 CORS ve JSON parse
-app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
+app.use(cors({ origin: "https://www.biyazsana.com" }));
 app.use(express.json());
 
 // 📌 Express Session Ayarları
