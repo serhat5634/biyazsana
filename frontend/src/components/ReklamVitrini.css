@@ -1,0 +1,115 @@
+.reklam-container {
+  background: #ffffff;
+  padding: 2rem;
+  border-radius: 14px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e6e6e6;
+  margin-top: 2rem;
+
+  /* 🔥 Aşağı taşmayı engellemek için */
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.reklam-title {
+  font-size: 1.6rem;
+  color: #e91e63;
+  border-bottom: 3px solid #e91e63;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.reklam-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.reklam-card {
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 1.5rem;
+  border-radius: 10px;
+  transition: box-shadow 0.3s ease;
+}
+
+.reklam-card:hover {
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+}
+
+.reklam-card h3 {
+  color: #444;
+  margin-bottom: 0.7rem;
+  font-size: 1.1rem;
+}
+
+.reklam-badge {
+  display: inline-block;
+  background-color: #f0f8ff;
+  color: #009688;
+  font-size: 0.85rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  margin-bottom: 0.7rem;
+}
+
+.reklam-badge.product {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.reklam-card p {
+  color: #555;
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+}
+
+.reklam-link {
+  display: inline-flex;
+  align-items: center;
+  color: #1976d2;
+  text-decoration: none;
+  font-weight: 600;
+  gap: 6px;
+  transition: color 0.3s;
+}
+
+.reklam-link:hover {
+  color: #0d47a1;
+}
+
+.social-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.social-links a {
+  background: #f7f7f7;
+  padding: 0.3rem 0.6rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  text-decoration: none;
+  color: #555;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: background-color 0.3s;
+}
+
+.social-links a:hover {
+  background-color: #eee;
+}
+
+.reklam-empty {
+  text-align: center;
+  color: #888;
+  font-style: italic;
+  margin-top: 1.5rem;
+}
+
+.reklam-date {
+  color: #999;
+  font-size: 0.85rem;
+  margin-top: 6px;
+}

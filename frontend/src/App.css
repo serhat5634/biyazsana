@@ -1,0 +1,193 @@
+/* 🌐 GLOBAL AYARLAR */
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f2fcfc; /* Hafif turkuaz arka plan */
+  color: #222;
+}
+
+/* 🚀 ANA KAPSAYICI */
+.app-container {
+  display: flex;
+  flex-direction: row;
+  min-height: 100vh;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+/* 📌 SOL MENÜ (Sidebar) */
+.sidebar {
+  width: 270px;
+  background-color: #ffffff;
+  border-right: 1px solid #eee;
+  padding: 2rem 1.5rem;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.02);
+}
+
+.sidebar h4 {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  color: #e91e63;
+  font-weight: 700;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar li {
+  margin-bottom: 12px;
+  padding: 12px 16px;
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.sidebar li:hover {
+  background-color: #e0f7f7;
+  border-color: #00bfa5;
+  color: #00bfa5;
+}
+
+/* 🎨 BAŞLIKLAR VE METİN */
+h1 {
+  font-size: 2.5rem;
+  color: #00bfa5;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+h3 {
+  color: #444;
+  font-weight: 600;
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+}
+
+/* 📝 FORM ALANLARI (Input, Textarea) */
+input, textarea {
+  width: 100%;
+  padding: 12px 16px;
+  margin: 10px 0;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+  background-color: #fff;
+}
+
+input:focus, textarea:focus {
+  border-color: #00bfa5;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 191, 165, 0.2);
+}
+
+/* 🎯 BUTON STİLLERİ */
+button {
+  background-color: #00bfa5;
+  color: white;
+  padding: 12px 24px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+button:hover {
+  background-color: #009e8f;
+  transform: scale(1.02);
+}
+
+/* 📦 SONUÇ GÖSTERİM KUTUSU */
+.result-container {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  padding: 24px;
+  margin-top: 2rem;
+  border-radius: 12px;
+  white-space: pre-wrap;
+  line-height: 1.7;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+}
+
+/* 📥 KOPYALA-İNDİR BUTONLARI */
+.copy-download-buttons {
+  margin-top: 1.5rem;
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.copy-download-buttons button {
+  flex: 1;
+  min-width: 130px;
+}
+
+/* 📢 REKLAM VİTRİNİ STİLLERİ */
+.reklam-vitrini {
+  background-color: #ffffff;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+  border: 1px solid #e6e6e6;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.reklam-vitrini h2 {
+  color: #e91e63;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.reklam-vitrini .reklam-item {
+  padding: 0.8rem;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 0.95rem;
+  transition: background-color 0.2s ease;
+}
+
+.reklam-vitrini .reklam-item:hover {
+  background-color: #fafafa;
+}
+
+
+.reklam-vitrini {
+  position: sticky; /* sabit pozisyon */
+  top: 100px; /* yukarıdan mesafe (header yüksekliğine göre ayarla) */
+  align-self: flex-start; /* kendi alanında yukarı taşır */
+}
+
+
+/* 🔖 ANASAYFA BOŞ MESAJI */
+.placeholder {
+  text-align: center;
+  margin-top: 4rem;
+  font-size: 1.1rem;
+  color: #555;
+}
+
+/* 🖱️ Scrollbar Stili */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #00bfa5;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #f0f0f0;
+}

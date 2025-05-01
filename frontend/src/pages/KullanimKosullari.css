@@ -1,0 +1,90 @@
+/* 📜 Kullanım Koşulları Stilleri */
+.kosullar-container {
+  max-width: 900px;
+  margin: auto;
+  padding: 2rem;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+  border: 1px solid #eee;
+}
+
+.page-title {
+  font-size: 2.6rem;
+  color: #009688;
+  margin-bottom: 2rem;
+  border-bottom: 3px solid #e91e63;
+  padding-bottom: 0.5rem;
+}
+
+.kosullar-container p,
+.kosullar-container ul {
+  font-size: 1rem;
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.kosullar-container ul {
+  padding-left: 1.2rem;
+  list-style-type: disc;
+}
+
+.footer-note {
+  font-size: 0.9rem;
+  color: #888;
+  text-align: right;
+}
+
+/* 📬 İletişim Formu Stilleri */
+.iletisim-container {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 2rem;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e0e0e0;
+}
+
+.iletisim-container h2 {
+  font-size: 1.6rem;
+  color: #009688;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.iletisim-container input,
+.iletisim-container textarea {
+  width: 100%;
+  padding: 12px 15px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 15px;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.iletisim-container button {
+  width: 100%;
+  padding: 12px;
+  background-color: #009688;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.iletisim-container button:hover {
+  background-color: #00796b;
+}
+
+.iletisim-container p {
+  margin-top: 1rem;
+  text-align: center;
+  font-weight: 600;
+}

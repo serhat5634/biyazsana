@@ -1,0 +1,43 @@
+/* Temel Stil Sıfırlama ve Genel Stil Ayarları */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #f9fafb; /* Tailwind bg-gray-50 karşılığı */
+  color: #1f2937; /* Tailwind text-gray-800 karşılığı */
+  font-family: 'Segoe UI', 'Roboto', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Link ayarları */
+a {
+  color: #ec4899; /* Tailwind text-pink-500 karşılığı */
+  transition: color 0.2s ease-in-out;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Scrollbar stil ayarı */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #ec4899; /* Tailwind pink-500 karşılığı */
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #e5e7eb; /* Tailwind gray-200 karşılığı */
+}
+
+/* Kod blokları stil ayarları */
+code {
+  background-color: #f3f4f6; /* Tailwind gray-100 karşılığı */
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.875rem;
+}

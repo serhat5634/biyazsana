@@ -1,0 +1,32 @@
+.sss-container {
+    max-width: 900px;
+    margin: auto;
+    padding: 2rem;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.05);
+    border: 1px solid #eee;
+  }
+  
+  .page-title {
+    font-size: 2.6rem;
+    color: #009688;
+    margin-bottom: 2rem;
+    border-bottom: 3px solid #e91e63;
+    padding-bottom: 0.5rem;
+  }
+  
+  .faq {
+    margin-bottom: 1.5rem;
+  }
+  
+  .faq h3 {
+    color: #e91e63;
+    font-size: 1.4rem;
+  }
+  
+  .faq p {
+    color: #555;
+    font-size: 1rem;
+  }
+  
