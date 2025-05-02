@@ -17,7 +17,7 @@ const User = require('./models/User');
 const app = express();
 
 // 🔧 Proxy ayarı (rate limiter için zorunlu)
-app.set('trust proxy', 1); // ✅ Bu satır eklendi
+app.set('trust proxy', 1);
 
 // 🧠 API Rotaları
 const generateRoute = require('./routes/generate');
@@ -25,13 +25,11 @@ const reklamlarRoute = require('./routes/ads');
 const contactRoute = require('./routes/contact');
 const mesajlarRoute = require('./routes/mesajlar');
 
-// 🔐 Güvenlik katmanı
+// 🔐 Güvenlik
 app.use(helmet());
-
-// 🔰 gzip sıkıştırma
 app.use(compression());
 
-// 🛡️ Rate Limiter (API Güvenliği)
+// 🛡️ Rate Limiter
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
@@ -41,6 +39,7 @@ const limiter = rateLimit({
 });
 app.use('/api/', limiter);
 
+// 🌐 CORS
 app.use(cors({
   origin: [
     "http://localhost:3000",
@@ -49,15 +48,16 @@ app.use(cors({
   ],
   credentials: true
 }));
+app.use(express.json());
 
-// 📌 Express Session Ayarları
+// 📌 Express Session
 app.use(session({
   secret: 'gizliSessionAnahtarı',
   resave: false,
   saveUninitialized: true
 }));
 
-// 🔑 Passport.js ayarları (Google OAuth)
+// 🔑 Passport (Google OAuth)
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -66,14 +66,14 @@ passport.deserializeUser((id, done) => {
   User.findById(id).then(user => done(null, user)).catch(done);
 });
 
+// 🔁 Google Strategy
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: '/api/auth/google/callback'
+  callbackURL: "https://biyazsana-backend-1.onrender.com/api/auth/google/callback" // ✅ Tam URL canlı ortam
 }, async (accessToken, refreshToken, profile, done) => {
   try {
     let user = await User.findOne({ email: profile.emails[0].value });
-
     if (!user) {
       user = await User.create({
         name: profile.displayName,
@@ -87,12 +87,12 @@ passport.use(new GoogleStrategy({
   }
 }));
 
-// 🌍 MongoDB bağlantısı
+// 🌍 MongoDB
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ MongoDB bağlantısı başarılı'))
-  .catch((err) => console.error('❌ MongoDB bağlantı hatası:', err));
+  .catch(err => console.error('❌ MongoDB bağlantı hatası:', err));
 
-// 🚀 API Rotalarının bağlanması
+// 🚀 Rotalar
 app.use('/api/generate', generateRoute);
 app.use('/api/reklamlar', reklamlarRoute);
 app.use('/api/contact', contactRoute);
@@ -100,7 +100,7 @@ app.use('/api/mesajlar', mesajlarRoute);
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/users', require('./routes/users'));
 
-// 🎯 Sunucunun başlatılması
+// 🟢 Başlat
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`✅ Backend running on port ${PORT}`);

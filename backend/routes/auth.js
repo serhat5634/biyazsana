@@ -6,39 +6,39 @@ const jwt = require('jsonwebtoken');
 const passport = require('passport');
 require('dotenv').config();
 
-// 📌 Güvenli Giriş Kontrolü ve Token Üretimi
+// 🔐 Giriş (Login) - E-posta & Şifre ile
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
   try {
     const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ msg: 'Kullanıcı bulunamadı.' });
+    if (!user) return res.status(400).json({ msg: '❌ Kullanıcı bulunamadı.' });
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ msg: 'Hatalı şifre.' });
+    if (!isMatch) return res.status(400).json({ msg: '❌ Hatalı şifre.' });
 
     const payload = { user: { id: user.id } };
-
     jwt.sign(
       payload,
       process.env.JWT_SECRET || 'gizliAnahtar',
       { expiresIn: '1d' },
       (err, token) => {
-        if (err) throw err;
+        if (err) return res.status(500).json({ msg: '❌ Token üretilemedi.' });
         res.json({ token });
       }
     );
   } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ msg: 'Sunucu hatası' });
+    console.error('Sunucu hatası:', err.message);
+    res.status(500).json({ msg: '❌ Sunucu hatası' });
   }
 });
 
-// ✅ Google OAuth rotaları
+// 🔁 Google ile Giriş - Başlat
 router.get('/google',
   passport.authenticate('google', { scope: ['profile', 'email'] })
 );
 
+// ✅ Google Callback (OAuth2 redirect URL)
 router.get('/google/callback',
   passport.authenticate('google', {
     failureRedirect: 'https://biyazsana.com/login',
