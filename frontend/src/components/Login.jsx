@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-
 import './Login.css';
 
 const Login = () => {
@@ -21,15 +20,16 @@ const Login = () => {
 
     try {
       const res = await axios.post(url, form);
-      // ✅ Token sadece başarılı girişte kaydedilir
-      if (res.data.token) {
-        sessionStorage.setItem('token', res.data.token);
-        navigate('/yazi');
-      } else {
-        setError('Token alınamadı.');
+
+      if (!res.data?.token) {
+        throw new Error('❌ Token alınamadı. Lütfen bilgileri kontrol edin.');
       }
+
+      sessionStorage.setItem('token', res.data.token);
+      navigate('/yazi');
     } catch (error) {
-      setError(error.response?.data?.msg || 'Bir hata oluştu.');
+      const backendMsg = error.response?.data?.msg;
+      setError(backendMsg || error.message || '❌ Bir hata oluştu.');
     }
   };
 
