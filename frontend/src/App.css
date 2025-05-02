@@ -12,9 +12,10 @@ body {
   display: flex;
   flex-direction: row;
   min-height: 100vh;
-  max-width: 1280px;
+  max-width: 100%;
   margin: 0 auto;
   padding: 1rem;
+  box-sizing: border-box;
 }
 
 /* 📌 Sidebar */
@@ -213,6 +214,7 @@ button:hover {
     flex-direction: column !important;
     align-items: flex-start !important;
     gap: 1rem;
+    width: 100%;
   }
 
   .navbar-buttons {

@@ -21,15 +21,20 @@ const Login = () => {
 
     try {
       const res = await axios.post(url, form);
-      sessionStorage.setItem('token', res.data.token); // ✅ Artık sessionStorage
-      navigate('/yazi');
+      // ✅ Token sadece başarılı girişte kaydedilir
+      if (res.data.token) {
+        sessionStorage.setItem('token', res.data.token);
+        navigate('/yazi');
+      } else {
+        setError('Token alınamadı.');
+      }
     } catch (error) {
       setError(error.response?.data?.msg || 'Bir hata oluştu.');
     }
   };
 
   const googleLogin = () => {
-    window.open('https://biyazsana-backend-1.onrender.com/api/auth/google', '_self'); // ✅ CANLI yönlendirme
+    window.open('https://biyazsana-backend-1.onrender.com/api/auth/google', '_self');
   };
 
   return (
