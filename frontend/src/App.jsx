@@ -1,6 +1,6 @@
 // 🌐 React ve Router
 import React, { useState, useEffect } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 
 // 📁 Componentler
 import Navbar from './components/Navbar';
@@ -13,10 +13,8 @@ import ReklamVitrini from './components/ReklamVitrini';
 import ReklamEkle from './components/ReklamEkle';
 import ProtectedRoute from './components/ProtectedRoute';
 import Login from './components/Login';
-import { useLocation } from 'react-router-dom'; 
 import Jetonlarim from './pages/Jetonlarim';
 import JetonAl from './pages/JetonAl';
-
 
 // 📄 Sayfalar
 import AdminPanel from './pages/AdminPanel';
@@ -122,29 +120,32 @@ function MainPage() {
 
 function App() {
   const location = useLocation();
+  const token = localStorage.getItem('token');
+  const isAuthenticated = !!token;
   const noNavbarFooter = location.pathname === '/login';
 
   return (
     <>
-      {!noNavbarFooter && <Navbar />}
-      
+      {!noNavbarFooter && isAuthenticated && <Navbar />}
+
       <Routes>
+        <Route path="/" element={isAuthenticated ? <Navigate to="/yazi" /> : <Navigate to="/login" />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/admin" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
-        <Route path="/" element={<ReklamEkle />} />
-        <Route path="/yazi" element={<MainPage />} />
-        <Route path="/category/:id" element={<CategorySelector />} />
+        <Route path="/yazi" element={<ProtectedRoute><MainPage /></ProtectedRoute>} />
+        <Route path="/category/:id" element={<ProtectedRoute><CategorySelector /></ProtectedRoute>} />
         <Route path="/iletisim" element={<IletisimFormu />} />
         <Route path="/gizlilik" element={<Gizlilik />} />
         <Route path="/hakkimizda" element={<Hakkimizda />} />
         <Route path="/kullanim-kosullari" element={<KullanimKosullari />} />
         <Route path="/sss" element={<SSS />} />
         <Route path="/iletisim-detay" element={<Iletisim />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/jetonlarim" element={<Jetonlarim />} />
-        <Route path="/jeton-al" element={<JetonAl />} />
+        <Route path="/jetonlarim" element={<ProtectedRoute><Jetonlarim /></ProtectedRoute>} />
+        <Route path="/jeton-al" element={<ProtectedRoute><JetonAl /></ProtectedRoute>} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
 
-      {!noNavbarFooter && <Footer />}
+      {!noNavbarFooter && isAuthenticated && <Footer />}
     </>
   );
 }
