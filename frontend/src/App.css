@@ -2,20 +2,22 @@
 body {
   margin: 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f2fcfc; /* Hafif turkuaz arka plan */
+  background-color: #f2fcfc;
   color: #222;
+  overflow-x: hidden;
 }
 
-/* 🚀 ANA KAPSAYICI */
+/* 🔁 Mobil uyumlu container yapısı */
 .app-container {
   display: flex;
   flex-direction: row;
   min-height: 100vh;
   max-width: 1280px;
   margin: 0 auto;
+  padding: 1rem;
 }
 
-/* 📌 SOL MENÜ (Sidebar) */
+/* 📌 Sidebar */
 .sidebar {
   width: 270px;
   background-color: #ffffff;
@@ -54,7 +56,6 @@ body {
   color: #00bfa5;
 }
 
-/* 🎨 BAŞLIKLAR VE METİN */
 h1 {
   font-size: 2.5rem;
   color: #00bfa5;
@@ -69,7 +70,6 @@ h3 {
   margin-bottom: 1rem;
 }
 
-/* 📝 FORM ALANLARI (Input, Textarea) */
 input, textarea {
   width: 100%;
   padding: 12px 16px;
@@ -88,7 +88,6 @@ input:focus, textarea:focus {
   box-shadow: 0 0 0 3px rgba(0, 191, 165, 0.2);
 }
 
-/* 🎯 BUTON STİLLERİ */
 button {
   background-color: #00bfa5;
   color: white;
@@ -107,7 +106,6 @@ button:hover {
   transform: scale(1.02);
 }
 
-/* 📦 SONUÇ GÖSTERİM KUTUSU */
 .result-container {
   background: #ffffff;
   border: 1px solid #e0e0e0;
@@ -119,7 +117,6 @@ button:hover {
   box-shadow: 0 4px 12px rgba(0,0,0,0.04);
 }
 
-/* 📥 KOPYALA-İNDİR BUTONLARI */
 .copy-download-buttons {
   margin-top: 1.5rem;
   display: flex;
@@ -133,7 +130,6 @@ button:hover {
   min-width: 130px;
 }
 
-/* 📢 REKLAM VİTRİNİ STİLLERİ */
 .reklam-vitrini {
   background-color: #ffffff;
   padding: 1.5rem;
@@ -142,6 +138,9 @@ button:hover {
   border: 1px solid #e6e6e6;
   width: 100%;
   box-sizing: border-box;
+  position: sticky;
+  top: 100px;
+  align-self: flex-start;
 }
 
 .reklam-vitrini h2 {
@@ -162,15 +161,6 @@ button:hover {
   background-color: #fafafa;
 }
 
-
-.reklam-vitrini {
-  position: sticky; /* sabit pozisyon */
-  top: 100px; /* yukarıdan mesafe (header yüksekliğine göre ayarla) */
-  align-self: flex-start; /* kendi alanında yukarı taşır */
-}
-
-
-/* 🔖 ANASAYFA BOŞ MESAJI */
 .placeholder {
   text-align: center;
   margin-top: 4rem;
@@ -178,7 +168,6 @@ button:hover {
   color: #555;
 }
 
-/* 🖱️ Scrollbar Stili */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -190,4 +179,33 @@ button:hover {
 
 ::-webkit-scrollbar-track {
   background-color: #f0f0f0;
+}
+
+/* 📱 Mobil ekranlara özel düzenlemeler */
+@media (max-width: 768px) {
+  .app-container {
+    flex-direction: column;
+    padding: 0.5rem;
+  }
+
+  .sidebar {
+    width: 100%;
+    padding: 1rem;
+    border-right: none;
+    border-bottom: 1px solid #eee;
+  }
+
+  .button, button {
+    width: 100%;
+    font-size: 1rem;
+  }
+
+  .copy-download-buttons {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .result-container {
+    padding: 1rem;
+  }
 }

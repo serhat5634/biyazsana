@@ -8,7 +8,7 @@ export default function Navbar() {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token'); // 🔁 localStorage değil
       if (!token) return;
 
       try {
@@ -52,7 +52,7 @@ export default function Navbar() {
         </button>
 
         <button
-          onClick={() => navigate('/')}
+          onClick={() => navigate('/reklam')}
           style={styles.button}
           onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#009e8f')}
           onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#00bfa5')}

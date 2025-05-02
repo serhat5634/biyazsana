@@ -21,7 +21,7 @@ const Login = () => {
 
     try {
       const res = await axios.post(url, form);
-      localStorage.setItem('token', res.data.token);
+      sessionStorage.setItem('token', res.data.token); // ✅ Artık sessionStorage
       navigate('/yazi');
     } catch (error) {
       setError(error.response?.data?.msg || 'Bir hata oluştu.');
@@ -29,7 +29,7 @@ const Login = () => {
   };
 
   const googleLogin = () => {
-    window.open('http://localhost:5000/api/auth/google', '_self'); // ✅ DOĞRU YÖNLENDİRME
+    window.open('https://biyazsana-backend-1.onrender.com/api/auth/google', '_self'); // ✅ CANLI yönlendirme
   };
 
   return (

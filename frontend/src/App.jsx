@@ -1,4 +1,3 @@
-// 🌐 React ve Router
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 
@@ -120,7 +119,7 @@ function MainPage() {
 
 function App() {
   const location = useLocation();
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token'); // ✅ Artık sessionStorage
   const isAuthenticated = !!token;
   const noNavbarFooter = location.pathname === '/login';
 
@@ -142,6 +141,7 @@ function App() {
         <Route path="/iletisim-detay" element={<Iletisim />} />
         <Route path="/jetonlarim" element={<ProtectedRoute><Jetonlarim /></ProtectedRoute>} />
         <Route path="/jeton-al" element={<ProtectedRoute><JetonAl /></ProtectedRoute>} />
+        <Route path="/reklam" element={<ProtectedRoute><ReklamEkle /></ProtectedRoute>} />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
 
