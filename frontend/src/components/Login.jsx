@@ -16,7 +16,10 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    const url = isRegister ? '/api/users/register' : '/api/auth/login';
+
+    const url = isRegister
+      ? 'https://biyazsana-backend-1.onrender.com/api/users/register'
+      : 'https://biyazsana-backend-1.onrender.com/api/auth/login';
 
     try {
       const res = await axios.post(url, form);
