@@ -208,4 +208,26 @@ button:hover {
   .result-container {
     padding: 1rem;
   }
+
+  .navbar {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 1rem;
+  }
+
+  .navbar-buttons {
+    flex-direction: column !important;
+    width: 100%;
+    gap: 10px;
+  }
+
+  .navbar-buttons button {
+    width: 100%;
+    font-size: 16px;
+  }
+
+  .navbar-welcome {
+    font-size: 14px;
+    margin-top: 8px;
+  }
 }

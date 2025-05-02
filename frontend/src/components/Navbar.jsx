@@ -8,7 +8,7 @@ export default function Navbar() {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const token = sessionStorage.getItem('token'); // 🔁 localStorage değil
+      const token = sessionStorage.getItem('token');
       if (!token) return;
 
       try {
