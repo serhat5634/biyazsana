@@ -1,12 +1,12 @@
 import axios from 'axios';
 
 const instance = axios.create({
-  baseURL: '/api', // ✅ Render veya canlı ortam için ideal: aynı domain kullanır
+  baseURL: 'https://api.biyazsana.com/api', // ✅ Yeni backend adresin
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 10000, // 10 saniye sonra istek iptal olur
-  withCredentials: true, // ✅ Girişli kullanıcılar için cookie/session taşır
+  timeout: 10000, // 10 saniyelik timeout
+  withCredentials: true, // ✅ Cookie ve session taşıma için
 });
 
 // ❗ Hata yakalama (isteğe bağlı ama faydalı)
