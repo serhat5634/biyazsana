@@ -11,6 +11,7 @@ const helmet = require('helmet');
 const mongoose = require('mongoose');
 const passport = require('passport');
 const session = require('express-session');
+const MongoStore = require('connect-mongo');  // Ekstra güvenlik için MongoStore
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const User = require('./models/User');
 
@@ -46,15 +47,24 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// 📌 Express Session (mobil ve cross-domain uyumlu)
+// 🌍 MongoDB Bağlantısı (iyileştirme yapıldı)
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => console.log('✅ MongoDB bağlantısı başarılı'))
+.catch(err => console.error('❌ MongoDB bağlantı hatası:', err));
+
+// 📌 Express Session (MongoDB store kullanıldı)
 app.use(session({
-  secret: 'gizliSessionAnahtarı',
+  secret: process.env.SESSION_SECRET || 'gizliSessionAnahtarı',
   resave: false,
-  saveUninitialized: true,
+  saveUninitialized: false,
   cookie: {
-    secure: true,           // sadece HTTPS üzerinde çalışır
-    sameSite: 'none'        // farklı domainlerde cookie çalışır (Google Login için şart)
-  }
+    secure: true,           // HTTPS şartı
+    sameSite: 'none'
+  },
+  store: MongoStore.create({ mongoUrl: process.env.MONGO_URI }) // MongoDB session store
 }));
 
 // 🔑 Passport (Google OAuth)
@@ -66,11 +76,11 @@ passport.deserializeUser((id, done) => {
   User.findById(id).then(user => done(null, user)).catch(done);
 });
 
-// 🔁 Google Strategy (GÜNCELLENDİ ✅)
+// 🔁 Google Strategy (güvenli callback URL ayarlandı)
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: "https://biyazsana.com/api/auth/google/callback"
+  callbackURL: process.env.GOOGLE_CALLBACK_URL || "https://biyazsana.com/api/auth/google/callback"
 }, async (accessToken, refreshToken, profile, done) => {
   try {
     let user = await User.findOne({ email: profile.emails[0].value });
@@ -86,11 +96,6 @@ passport.use(new GoogleStrategy({
     return done(err, null);
   }
 }));
-
-// 🌍 MongoDB
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('✅ MongoDB bağlantısı başarılı'))
-  .catch(err => console.error('❌ MongoDB bağlantı hatası:', err));
 
 // 🧠 API Rotaları
 const generateRoute = require('./routes/generate');
