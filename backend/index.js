@@ -43,8 +43,11 @@ app.use(cors({
     "https://biyazsana-backend-1.onrender.com",
     "https://biyazsana.onrender.com"
   ],
-  credentials: true
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
 }));
+
 
 app.use(express.json());
 
