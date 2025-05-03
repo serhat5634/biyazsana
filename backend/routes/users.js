@@ -17,8 +17,7 @@ router.post('/register', async (req, res) => {
     user = new User({
       name,
       email,
-      password
-      // jeton: 3 // Gerek yok, modelde default olarak tanımlı
+      password // tokens: 3 default'ta zaten var
     });
 
     const salt = await bcrypt.genSalt(10);
@@ -55,7 +54,7 @@ router.get('/me', async (req, res) => {
   }
 });
 
-// ✅ Jeton ekleme (Simülasyon)
+// ✅ Jeton ekleme (admin veya ödeme sonrası)
 router.post('/add-jeton', async (req, res) => {
   const { adet, userId } = req.body;
 
@@ -63,12 +62,30 @@ router.post('/add-jeton', async (req, res) => {
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ msg: 'Kullanıcı bulunamadı.' });
 
-    user.jeton += adet;
+    user.tokens = (user.tokens || 0) + adet;
     await user.save();
 
-    res.json({ msg: `${adet} jeton başarıyla eklendi.` });
+    res.json({ msg: `${adet} jeton başarıyla eklendi.`, tokens: user.tokens });
   } catch (err) {
-    console.error(err);
+    console.error('Jeton eklenemedi:', err);
+    res.status(500).json({ msg: 'Sunucu hatası' });
+  }
+});
+
+// ✅ Jeton sıfırlama (admin)
+router.post('/reset-jeton', async (req, res) => {
+  const { userId } = req.body;
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ msg: 'Kullanıcı bulunamadı.' });
+
+    user.tokens = 0;
+    await user.save();
+
+    res.json({ msg: 'Jetonlar sıfırlandı.', tokens: user.tokens });
+  } catch (err) {
+    console.error('Jeton sıfırlama hatası:', err);
     res.status(500).json({ msg: 'Sunucu hatası' });
   }
 });

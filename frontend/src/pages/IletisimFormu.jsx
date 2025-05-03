@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import axios from '../axios'; // veya 'src/axios' konumuna göre düzelt
 import './IletisimFormu.css';
 
 const IletisimFormu = () => {

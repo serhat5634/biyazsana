@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import axios from '../axios'; // veya 'src/axios' konumuna göre düzelt
+
 
 const ReklamEkle = () => {
   const MAX_TITLE = 50;

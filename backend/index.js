@@ -19,12 +19,6 @@ const app = express();
 // 🔧 Proxy ayarı (rate limiter için zorunlu)
 app.set('trust proxy', 1);
 
-// 🧠 API Rotaları
-const generateRoute = require('./routes/generate');
-const reklamlarRoute = require('./routes/ads');
-const contactRoute = require('./routes/contact');
-const mesajlarRoute = require('./routes/mesajlar');
-
 // 🔐 Güvenlik
 app.use(helmet());
 app.use(compression());
@@ -44,17 +38,23 @@ app.use(cors({
   origin: [
     "http://localhost:3000",
     "https://biyazsana.com",
-    "https://www.biyazsana.com"
+    "https://www.biyazsana.com",
+    "https://biyazsana-backend-1.onrender.com",
+    "https://biyazsana.onrender.com"
   ],
   credentials: true
 }));
 app.use(express.json());
 
-// 📌 Express Session
+// 📌 Express Session (mobil ve cross-domain uyumlu)
 app.use(session({
   secret: 'gizliSessionAnahtarı',
   resave: false,
-  saveUninitialized: true
+  saveUninitialized: true,
+  cookie: {
+    secure: true,           // sadece HTTPS üzerinde çalışır
+    sameSite: 'none'        // farklı domainlerde cookie çalışır (Google Login için şart)
+  }
 }));
 
 // 🔑 Passport (Google OAuth)
@@ -66,11 +66,11 @@ passport.deserializeUser((id, done) => {
   User.findById(id).then(user => done(null, user)).catch(done);
 });
 
-// 🔁 Google Strategy
+// 🔁 Google Strategy (GÜNCELLENDİ ✅)
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: "https://biyazsana-backend-1.onrender.com/api/auth/google/callback" // ✅ Tam URL canlı ortam
+  callbackURL: "https://biyazsana.com/api/auth/google/callback"
 }, async (accessToken, refreshToken, profile, done) => {
   try {
     let user = await User.findOne({ email: profile.emails[0].value });
@@ -92,15 +92,25 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ MongoDB bağlantısı başarılı'))
   .catch(err => console.error('❌ MongoDB bağlantı hatası:', err));
 
+// 🧠 API Rotaları
+const generateRoute = require('./routes/generate');
+const reklamlarRoute = require('./routes/ads');
+const contactRoute = require('./routes/contact');
+const mesajlarRoute = require('./routes/mesajlar');
+const authRoute = require('./routes/auth');
+const usersRoute = require('./routes/users');
+const paytrRoute = require('./routes/paytr');
+
 // 🚀 Rotalar
 app.use('/api/generate', generateRoute);
 app.use('/api/reklamlar', reklamlarRoute);
 app.use('/api/contact', contactRoute);
 app.use('/api/mesajlar', mesajlarRoute);
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/users', require('./routes/users'));
+app.use('/api/auth', authRoute);
+app.use('/api/users', usersRoute);
+app.use('/api/paytr', paytrRoute);
 
-// 🟢 Başlat
+// 🟢 Sunucu Başlat
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`✅ Backend running on port ${PORT}`);

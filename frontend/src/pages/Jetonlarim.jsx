@@ -38,8 +38,12 @@ const Jetonlarim = () => {
     <div style={styles.container}>
       <div style={styles.card}>
         <h2 style={styles.title}>🪙 Jeton Bilgilerin</h2>
-        <p style={styles.jeton}>Toplam Jeton: <strong>{user.jeton}</strong></p>
-        <p style={styles.info}>Jetonunla özel yazılar oluşturabilirsin. Jetonun biterse yenisini alabilirsin.</p>
+        <p style={styles.jeton}>
+          Toplam Jeton: <strong>{user.tokens}</strong>
+        </p>
+        <p style={styles.info}>
+          Jetonunla özel yazılar oluşturabilirsin. Jetonun biterse yenisini alabilirsin.
+        </p>
 
         <button style={styles.button} onClick={() => navigate('/jeton-al')}>
           ➕ Jeton Satın Al

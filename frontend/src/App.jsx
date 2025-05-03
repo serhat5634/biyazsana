@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import JetonBasarili from './pages/JetonBasarili';
+import JetonBasarisiz from './pages/JetonBasarisiz';
 
 // 📁 Componentler
 import Navbar from './components/Navbar';
@@ -14,6 +16,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Login from './components/Login';
 import Jetonlarim from './pages/Jetonlarim';
 import JetonAl from './pages/JetonAl';
+import Mesajlarim from './pages/Mesajlarim'; // ✅ Ekledik
 
 // 📄 Sayfalar
 import AdminPanel from './pages/AdminPanel';
@@ -119,7 +122,7 @@ function MainPage() {
 
 function App() {
   const location = useLocation();
-  const token = sessionStorage.getItem('token'); // ✅ Artık sessionStorage
+  const token = sessionStorage.getItem('token');
   const isAuthenticated = !!token;
   const noNavbarFooter = location.pathname === '/login';
 
@@ -138,10 +141,13 @@ function App() {
         <Route path="/hakkimizda" element={<Hakkimizda />} />
         <Route path="/kullanim-kosullari" element={<KullanimKosullari />} />
         <Route path="/sss" element={<SSS />} />
+        <Route path="/jeton-basarili" element={<JetonBasarili />} />
+        <Route path="/jeton-basarisiz" element={<JetonBasarisiz />} />
         <Route path="/iletisim-detay" element={<Iletisim />} />
         <Route path="/jetonlarim" element={<ProtectedRoute><Jetonlarim /></ProtectedRoute>} />
         <Route path="/jeton-al" element={<ProtectedRoute><JetonAl /></ProtectedRoute>} />
         <Route path="/reklam" element={<ProtectedRoute><ReklamEkle /></ProtectedRoute>} />
+        <Route path="/mesajlarim" element={<ProtectedRoute><Mesajlarim /></ProtectedRoute>} /> {/* ✅ eklendi */}
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
 

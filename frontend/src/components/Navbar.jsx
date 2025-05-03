@@ -59,6 +59,15 @@ export default function Navbar() {
         >
           🚀 Reklam Ver
         </button>
+
+        <button
+          onClick={() => navigate('/mesajlarim')}
+          style={styles.button}
+          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#00897B')}
+          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#00bfa5')}
+        >
+          📬 Mesajlarım
+        </button>
       </div>
     </div>
   );

@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 const JetonAl = () => {
   const navigate = useNavigate();
-  const [userId, setUserId] = useState(null);
+  const [user, setUser] = useState(null);
 
   const packages = [
     { id: 1, jeton: 3, price: 42 },
@@ -14,7 +14,7 @@ const JetonAl = () => {
   ];
 
   useEffect(() => {
-    const fetchUserId = async () => {
+    const fetchUser = async () => {
       const token = localStorage.getItem('token');
       if (!token) return navigate('/login');
 
@@ -22,28 +22,42 @@ const JetonAl = () => {
         const res = await axios.get('/api/users/me', {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setUserId(res.data._id);
+        setUser(res.data);
       } catch (err) {
         console.error('Kullanıcı alınamadı');
         navigate('/login');
       }
     };
 
-    fetchUserId();
+    fetchUser();
   }, [navigate]);
 
-  const handlePurchase = async (adet) => {
+  const handlePurchase = async (paket) => {
     try {
-      await axios.post(`/api/users/add-jeton`, {
-        adet,
-        userId
+      const res = await axios.post('/api/paytr/create-token', {
+        email: user.email,
+        amount: paket.price,
+        userId: user._id,
+        jetonAdet: paket.jeton,
       });
 
-      alert(`${adet} jeton başarıyla eklendi!`);
-      navigate('/jetonlarim');
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = 'https://www.paytr.com/odeme';
+
+      for (const key in res.data.tokenParams) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = key;
+        input.value = res.data.tokenParams[key];
+        form.appendChild(input);
+      }
+
+      document.body.appendChild(form);
+      form.submit(); // 🔁 PayTR ödeme sayfasına yönlendirir
     } catch (err) {
-      console.error('Jeton eklenemedi:', err);
-      alert('Jeton eklenirken hata oluştu.');
+      console.error('❌ PayTR formu oluşturulamadı:', err);
+      alert('Ödeme başlatılamadı. Lütfen tekrar deneyin.');
     }
   };
 
@@ -55,7 +69,7 @@ const JetonAl = () => {
           <div key={p.id} style={styles.card}>
             <h3>{p.jeton} Jeton</h3>
             <p>{p.price} TL</p>
-            <button style={styles.button} onClick={() => handlePurchase(p.jeton)}>
+            <button style={styles.button} onClick={() => handlePurchase(p)}>
               Satın Al
             </button>
           </div>
