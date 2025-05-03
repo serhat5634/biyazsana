@@ -1,15 +1,15 @@
-// src/axios.js
 import axios from 'axios';
 
 const instance = axios.create({
-  baseURL: 'https://biyazsana-backend-1.onrender.com/api',
+  baseURL: '/api', // ✅ Render veya canlı ortam için ideal: aynı domain kullanır
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 10000, // Maksimum 10 saniye beklesin
+  timeout: 10000, // 10 saniye sonra istek iptal olur
+  withCredentials: true, // ✅ Girişli kullanıcılar için cookie/session taşır
 });
 
-// Hata yakalama (opsiyonel ama faydalı)
+// ❗ Hata yakalama (isteğe bağlı ama faydalı)
 instance.interceptors.response.use(
   response => response,
   error => {
