@@ -11,7 +11,7 @@ const helmet = require('helmet');
 const mongoose = require('mongoose');
 const passport = require('passport');
 const session = require('express-session');
-const MongoStore = require('connect-mongo');  // Ekstra güvenlik için MongoStore
+const MongoStore = require('connect-mongo');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const User = require('./models/User');
 
@@ -45,29 +45,27 @@ app.use(cors({
   ],
   credentials: true
 }));
+
 app.use(express.json());
 
-// 🌍 MongoDB Bağlantısı (iyileştirme yapıldı)
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => console.log('✅ MongoDB bağlantısı başarılı'))
-.catch(err => console.error('❌ MongoDB bağlantı hatası:', err));
+// 🌍 MongoDB Bağlantısı (güncellendi 🚀)
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log('✅ MongoDB bağlantısı başarılı'))
+  .catch(err => console.error('❌ MongoDB bağlantı hatası:', err));
 
-// 📌 Express Session (MongoDB store kullanıldı)
+// 📌 Express Session (MongoDB Store güvenli ve güncel 🛡️)
 app.use(session({
   secret: process.env.SESSION_SECRET || 'gizliSessionAnahtarı',
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: true,           // HTTPS şartı
+    secure: true,
     sameSite: 'none'
   },
-  store: MongoStore.create({ mongoUrl: process.env.MONGO_URI }) // MongoDB session store
+  store: MongoStore.create({ mongoUrl: process.env.MONGO_URI })
 }));
 
-// 🔑 Passport (Google OAuth)
+// 🔑 Passport (Google OAuth ✅)
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -76,7 +74,7 @@ passport.deserializeUser((id, done) => {
   User.findById(id).then(user => done(null, user)).catch(done);
 });
 
-// 🔁 Google Strategy (güvenli callback URL ayarlandı)
+// 🔁 Google Strategy (Güvenli ve Doğru URL 🔐)
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,

@@ -1,15 +1,14 @@
 import axios from 'axios';
 
 const instance = axios.create({
-  baseURL: 'https://api.biyazsana.com/api', // ✅ Yeni backend adresin
+  baseURL: 'https://biyazsana.com/api',
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 10000, // 10 saniyelik timeout
-  withCredentials: true, // ✅ Cookie ve session taşıma için
+  timeout: 10000,
+  withCredentials: true,
 });
 
-// ❗ Hata yakalama (isteğe bağlı ama faydalı)
 instance.interceptors.response.use(
   response => response,
   error => {
