@@ -9,7 +9,6 @@ const User = require('../models/User');
 const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 globalThis.fetch = fetch;
 
-// Jeton bedeli haritası (ileride veritabanına taşınabilir)
 const jetonBedelleri = {
   'CV Yazımı': 5,
   'Marka Tanıtım Sunumu': 3,
@@ -26,10 +25,9 @@ router.post('/', async (req, res) => {
     email, phone, languages, certifications, references
   } = req.body;
 
-  // ✅ JWT token kontrolü
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ message: 'Yetkisiz erişim' });
+    return res.status(401).json({ message: 'Yetkisiz erişim: Token eksik veya geçersiz.' });
   }
 
   const token = authHeader.split(' ')[1];
@@ -40,42 +38,34 @@ router.post('/', async (req, res) => {
 
     if (!user) return res.status(404).json({ message: 'Kullanıcı bulunamadı.' });
 
-    // ✅ Jeton ücreti hesapla
     const jetonBedeli = jetonBedelleri[subCategory] || 1;
 
     if (user.tokens < jetonBedeli) {
       return res.status(403).json({
-        message: `Bu içerik için ${jetonBedeli} jeton gerekir. Jetonun yetersiz.`
+        message: `Bu içerik için ${jetonBedeli} jeton gerekiyor ancak jetonun yetersiz.`
       });
     }
 
-    // ✅ Prompt üretimi
     const userPrompt = generatePrompt({
       name, job, skills, education, experience,
       target, location, category, subCategory, additionalInfo,
       email, phone, languages, certifications, references
     });
 
-    let systemMessage = '';
-
-    if (subCategory === 'Marka Tanıtım Sunumu') {
-      systemMessage = `
-        Sen BiYazsana platformunda çalışan kurumsal bir marka yazarı yapay zekâsısın.
-        Her içerikte "ben" dili kullanmamalısın.
-        Markayı dışarıdan anlatan, kurumsal ve prestijli bir dil kullan.
-        Sade, doğal, güven veren ve profesyonel bir yazı oluştur.
-        Marka adı, sektör ve ürün bilgileri doğal bir akışla yer alsın.
-        Uydurma bilgi ekleme.
-      `.trim();
-    } else {
-      systemMessage = `
-        Sen BiYazsana platformunda çalışan profesyonel bir içerik yazarı yapay zekâsısın.
-        Her içerikte kişi kendisi yazıyormuş gibi "ben dili" kullan.
-        Dil sade, doğal ve profesyonel olsun.
-        Sadece verilen verilerle özgün bir yazı oluştur.
-        Uydurma bilgi ekleme.
-      `.trim();
-    }
+    const systemMessage = subCategory === 'Marka Tanıtım Sunumu' ? `
+      Sen BiYazsana platformunda çalışan kurumsal bir marka yazarı yapay zekâsısın.
+      Her içerikte "ben" dili kullanmamalısın.
+      Markayı dışarıdan anlatan, kurumsal ve prestijli bir dil kullan.
+      Sade, doğal, güven veren ve profesyonel bir yazı oluştur.
+      Marka adı, sektör ve ürün bilgileri doğal bir akışla yer alsın.
+      Uydurma bilgi ekleme.
+    `.trim() : `
+      Sen BiYazsana platformunda çalışan profesyonel bir içerik yazarı yapay zekâsısın.
+      Her içerikte kişi kendisi yazıyormuş gibi "ben dili" kullan.
+      Dil sade, doğal ve profesyonel olsun.
+      Sadece verilen verilerle özgün bir yazı oluştur.
+      Uydurma bilgi ekleme.
+    `.trim();
 
     const messages = [
       { role: "system", content: systemMessage },
@@ -89,16 +79,18 @@ router.post('/', async (req, res) => {
       max_tokens: 1000
     });
 
-    // ✅ Jetonu düşür
+    if (!completion || !completion.choices || completion.choices.length === 0) {
+      return res.status(500).json({ message: '❌ Yapay zeka içeriği oluşturamadı. Tekrar deneyin.' });
+    }
+
     user.tokens -= jetonBedeli;
     await user.save();
 
-    // ✅ İçeriği döndür
     res.json({ result: completion.choices[0].message.content });
 
   } catch (err) {
-    console.error("🔥 AI Hatası:", err);
-    res.status(500).json({ error: "İçerik oluşturulamadı." });
+    console.error("🔥 AI veya JWT Hatası:", err);
+    res.status(500).json({ error: "Sunucu hatası: İçerik oluşturulamadı veya token hatalı." });
   }
 });
 
