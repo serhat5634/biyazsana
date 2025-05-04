@@ -1,10 +1,7 @@
 import axios from 'axios';
 
 const instance = axios.create({
-  baseURL: 'https://biyazsana-backend-1.onrender.com/api', // ✅ Canlı backend URL'si
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  baseURL: 'https://biyazsana-backend-1.onrender.com/api',
   timeout: 10000,
   withCredentials: true,
 });
