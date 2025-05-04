@@ -6,6 +6,18 @@ const instance = axios.create({
   withCredentials: true,
 });
 
+// 🔑 JWT token her istekte gönderilsin
+instance.interceptors.request.use(
+  config => {
+    const token = sessionStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  error => Promise.reject(error)
+);
+
 instance.interceptors.response.use(
   response => response,
   error => {

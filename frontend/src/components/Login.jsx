@@ -36,7 +36,7 @@ const Login = () => {
   };
 
   const googleLogin = () => {
-    window.open('/auth/google', '_self'); // ✅ axios baseURL kullandığı için kısaltıldı
+    window.open('https://biyazsana-backend-1.onrender.com/api/auth/google', '_self');
   };
 
   return (
