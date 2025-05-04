@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import axios from '../axios'; // ✅ Merkezi axios kullanımı
 import { useNavigate } from 'react-router-dom';
 import './Login.css';
 
@@ -17,27 +17,26 @@ const Login = () => {
     e.preventDefault();
     setError('');
 
-    const url = isRegister
-      ? 'https://biyazsana-backend-1.onrender.com/api/users/register'
-      : 'https://biyazsana-backend-1.onrender.com/api/auth/login';
+    const endpoint = isRegister ? '/users/register' : '/auth/login';
 
     try {
-      const res = await axios.post(url, form);
+      const res = await axios.post(endpoint, form);
 
       if (!res.data?.token) {
-        throw new Error('❌ Token alınamadı. Lütfen bilgileri kontrol edin.');
+        throw new Error('❌ Giriş yapılamadı. Lütfen bilgilerinizi kontrol edin.');
       }
 
       sessionStorage.setItem('token', res.data.token);
+      setForm({ email: '', password: '', name: '' }); // ✅ Form sıfırlandı
       navigate('/yazi');
     } catch (error) {
       const backendMsg = error.response?.data?.msg;
-      setError(backendMsg || error.message || '❌ Bir hata oluştu.');
+      setError(backendMsg || '❌ Bir hata oluştu. Lütfen tekrar deneyin.');
     }
   };
 
   const googleLogin = () => {
-    window.open('https://biyazsana-backend-1.onrender.com/api/auth/google', '_self');
+    window.open('/auth/google', '_self'); // ✅ axios baseURL kullandığı için kısaltıldı
   };
 
   return (
@@ -51,6 +50,7 @@ const Login = () => {
               type="text"
               placeholder="Ad Soyad"
               required
+              value={form.name}
               onChange={handleChange}
             />
           )}
@@ -59,6 +59,7 @@ const Login = () => {
             type="email"
             placeholder="E-posta Adresiniz"
             required
+            value={form.email}
             onChange={handleChange}
           />
           <input
@@ -66,6 +67,7 @@ const Login = () => {
             type="password"
             placeholder="Şifreniz"
             required
+            value={form.password}
             onChange={handleChange}
           />
 

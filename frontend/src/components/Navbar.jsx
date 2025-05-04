@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axios from '../axios';
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -8,14 +8,14 @@ export default function Navbar() {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const token = sessionStorage.getItem('token');
+      const token = localStorage.getItem('token');
       if (!token) return;
 
       try {
-        const res = await axios.get('/api/users/me', {
+        const res = await axios.get('/users/me', {
           headers: {
-            Authorization: `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         });
         setUser(res.data);
       } catch (err) {
@@ -25,6 +25,12 @@ export default function Navbar() {
 
     fetchUser();
   }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    setUser(null);
+    navigate('/login');
+  };
 
   return (
     <div style={styles.navbar}>
@@ -37,6 +43,9 @@ export default function Navbar() {
         {user && (
           <div style={styles.welcomeContainer}>
             👋 <span style={{ fontWeight: 'bold' }}>{user.name}</span>, hoş geldin!
+            <span style={{ marginLeft: '10px', color: '#00bfa5', fontWeight: 'bold' }}>
+              🪙 {user.tokens} Jeton
+            </span>
           </div>
         )}
       </div>
@@ -68,6 +77,17 @@ export default function Navbar() {
         >
           📬 Mesajlarım
         </button>
+
+        {user && (
+          <button
+            onClick={handleLogout}
+            style={{ ...styles.button, backgroundColor: '#f44336' }}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#d32f2f')}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#f44336')}
+          >
+            🚪 Çıkış Yap
+          </button>
+        )}
       </div>
     </div>
   );

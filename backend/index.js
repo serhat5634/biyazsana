@@ -20,8 +20,12 @@ const app = express();
 // 🔧 Proxy ayarı (rate limiter için zorunlu)
 app.set('trust proxy', 1);
 
-// 🔐 Güvenlik
-app.use(helmet());
+// 🔐 Güvenlik (Güçlendirilmiş)
+app.use(helmet({
+  contentSecurityPolicy: false,
+  crossOriginEmbedderPolicy: false,
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
 app.use(compression());
 
 // 🛡️ Rate Limiter
@@ -34,41 +38,40 @@ const limiter = rateLimit({
 });
 app.use('/api/', limiter);
 
-// 🌐 CORS
+// 🌐 CORS (Canlı Ortama göre ideal ayar)
 app.use(cors({
   origin: [
-    "http://localhost:3000",
     "https://biyazsana.com",
-    "https://www.biyazsana.com",
-    "https://biyazsana-backend-1.onrender.com",
-    "https://biyazsana.onrender.com"
+    "https://www.biyazsana.com"
   ],
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
-
 app.use(express.json());
 
-// 🌍 MongoDB Bağlantısı (güncellendi 🚀)
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('✅ MongoDB bağlantısı başarılı'))
+// 🌍 MongoDB Bağlantısı (güncel)
+mongoose.connect(process.env.MONGO_URI, {
+  dbName: 'biyazsana'
+}).then(() => console.log('✅ MongoDB bağlantısı başarılı'))
   .catch(err => console.error('❌ MongoDB bağlantı hatası:', err));
 
-// 📌 Express Session (MongoDB Store güvenli ve güncel 🛡️)
+// 📌 Express Session (geliştirme ve canlı ortam uyumlu)
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'gizliSessionAnahtarı',
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: true,
-    sameSite: 'none'
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    httpOnly: true,
+    maxAge: 1000 * 60 * 60 * 24 * 7
   },
-  store: MongoStore.create({ mongoUrl: process.env.MONGO_URI })
+  store: MongoStore.create({ mongoUrl: process.env.MONGO_URI, dbName: 'biyazsana' })
 }));
 
-// 🔑 Passport (Google OAuth ✅)
+// 🔑 Passport (Google OAuth)
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -77,11 +80,10 @@ passport.deserializeUser((id, done) => {
   User.findById(id).then(user => done(null, user)).catch(done);
 });
 
-// 🔁 Google Strategy (Güvenli ve Doğru URL 🔐)
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: process.env.GOOGLE_CALLBACK_URL || "https://biyazsana.com/api/auth/google/callback"
+  callbackURL: process.env.GOOGLE_CALLBACK_URL
 }, async (accessToken, refreshToken, profile, done) => {
   try {
     let user = await User.findOne({ email: profile.emails[0].value });

@@ -1,104 +1,51 @@
 const express = require('express');
 const router = express.Router();
-const generatePrompt = require('../utils/generatePrompt');
-const openai = require('../openai');
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const Contact = require('../models/Contact');
 
-// node-fetch çözümü
-const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
-globalThis.fetch = fetch;
-
-// Jeton bedeli haritası
-const jetonBedelleri = {
-  'CV Yazımı': 5,
-  'Marka Tanıtım Sunumu': 3,
-  'Blog Yazısı': 2,
-  'Sosyal Medya Postu': 1,
-  'Akademik Metin': 4,
-  'Reklam': 5
-};
-
+// ✅ Kullanıcı mesajını gönder
 router.post('/', async (req, res) => {
-  const {
-    name, job, skills, education, experience,
-    target, location, category, subCategory, additionalInfo,
-    email, phone, languages, certifications, references
-  } = req.body;
-
-  // ✅ JWT token kontrolü
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ message: 'Yetkisiz erişim' });
-  }
-
-  const token = authHeader.split(' ')[1];
+  const { email, message } = req.body;
 
   try {
-    const decoded = jwt.verify(token, 'gizliAnahtar');
-    const user = await User.findById(decoded.user.id);
-
-    if (!user) return res.status(404).json({ message: 'Kullanıcı bulunamadı.' });
-
-    // ✅ Jeton ücreti hesapla
-    const jetonBedeli = jetonBedelleri[subCategory] || 1;
-
-    if (user.tokens < jetonBedeli) {
-      return res.status(403).json({
-        message: `Bu içerik için ${jetonBedeli} jeton gerekir. Jetonun yetersiz.`
-      });
-    }
-
-    // ✅ Prompt üretimi
-    const userPrompt = generatePrompt({
-      name, job, skills, education, experience,
-      target, location, category, subCategory, additionalInfo,
-      email, phone, languages, certifications, references
-    });
-
-    let systemMessage = '';
-
-    if (subCategory === 'Marka Tanıtım Sunumu') {
-      systemMessage = `
-        Sen BiYazsana platformunda çalışan kurumsal bir marka yazarı yapay zekâsısın.
-        Her içerikte "ben" dili kullanmamalısın.
-        Markayı dışarıdan anlatan, kurumsal ve prestijli bir dil kullan.
-        Sade, doğal, güven veren ve profesyonel bir yazı oluştur.
-        Marka adı, sektör ve ürün bilgileri doğal bir akışla yer alsın.
-        Uydurma bilgi ekleme.
-      `.trim();
-    } else {
-      systemMessage = `
-        Sen BiYazsana platformunda çalışan profesyonel bir içerik yazarı yapay zekâsısın.
-        Her içerikte kişi kendisi yazıyormuş gibi "ben dili" kullan.
-        Dil sade, doğal ve profesyonel olsun.
-        Sadece verilen verilerle özgün bir yazı oluştur.
-        Uydurma bilgi ekleme.
-      `.trim();
-    }
-
-    const messages = [
-      { role: "system", content: systemMessage },
-      { role: "user", content: userPrompt }
-    ];
-
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4-turbo",
-      messages,
-      temperature: 0.75,
-      max_tokens: 1000
-    });
-
-    // ✅ Jetonu düşür
-    user.tokens -= jetonBedeli;
-    await user.save();
-
-    // ✅ İçeriği döndür
-    res.json({ result: completion.choices[0].message.content });
-
+    const newMessage = new Contact({ email, message });
+    await newMessage.save();
+    res.json({ msg: 'Mesajınız başarıyla gönderildi!' });
   } catch (err) {
-    console.error("🔥 AI Hatası:", err);
-    res.status(500).json({ error: "İçerik oluşturulamadı." });
+    console.error('Mesaj gönderilemedi:', err);
+    res.status(500).json({ msg: 'Sunucu hatası' });
+  }
+});
+
+// ✅ Tüm mesajları getir (Admin)
+router.get('/', async (req, res) => {
+  try {
+    const messages = await Contact.find().sort({ createdAt: -1 });
+    res.json(messages);
+  } catch (err) {
+    console.error('Mesajlar alınamadı:', err);
+    res.status(500).json({ msg: 'Sunucu hatası' });
+  }
+});
+
+// ✅ Mesaja admin tarafından yanıt ekle
+router.post('/:id/reply', async (req, res) => {
+  const { reply } = req.body;
+
+  try {
+    const updatedMessage = await Contact.findByIdAndUpdate(
+      req.params.id,
+      { reply },
+      { new: true }
+    );
+
+    if (!updatedMessage) {
+      return res.status(404).json({ msg: 'Mesaj bulunamadı.' });
+    }
+
+    res.json(updatedMessage);
+  } catch (err) {
+    console.error('Yanıt eklenemedi:', err);
+    res.status(500).json({ msg: 'Sunucu hatası' });
   }
 });
 

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import axios from '../axios'; // veya 'src/axios' konumuna göre düzelt
-
+import axios from '../axios';
 
 const ReklamEkle = () => {
   const MAX_TITLE = 50;
@@ -33,7 +32,7 @@ const ReklamEkle = () => {
     setMessage('');
 
     try {
-      await axios.post('http://localhost:5000/api/reklamlar', form);
+      await axios.post('/api/reklamlar', form);
       setMessage('✅ Reklam başarıyla gönderildi!');
       setForm({
         reklamTuru: '',
@@ -72,7 +71,9 @@ const ReklamEkle = () => {
             required
             className="w-full p-3 rounded-lg border border-gray-300"
           />
-          <div className="text-right text-sm text-gray-500 mt-1">{form.reklamBasligi.length}/{MAX_TITLE} karakter</div>
+          <div className="text-right text-sm text-gray-500 mt-1">
+            {form.reklamBasligi.length}/{MAX_TITLE} karakter
+          </div>
         </div>
 
         <div>
@@ -84,11 +85,20 @@ const ReklamEkle = () => {
             rows={4}
             className="w-full p-3 rounded-lg border border-gray-300 resize-vertical"
           />
-          <div className="text-right text-sm text-gray-500 mt-1">{form.aciklama.length}/{MAX_DESC} karakter</div>
+          <div className="text-right text-sm text-gray-500 mt-1">
+            {form.aciklama.length}/{MAX_DESC} karakter
+          </div>
         </div>
 
         {form.reklamTuru === 'product' && (
-          <input name="link" placeholder="🔗 Web Sitesi veya Ürün Linki" value={form.link} onChange={handleChange} required className="w-full p-3 rounded-lg border border-gray-300"/>
+          <input
+            name="link"
+            placeholder="🔗 Web Sitesi veya Ürün Linki"
+            value={form.link}
+            onChange={handleChange}
+            required
+            className="w-full p-3 rounded-lg border border-gray-300"
+          />
         )}
 
         {form.reklamTuru === 'social' && (

@@ -2,9 +2,22 @@ const express = require('express');
 const router = express.Router();
 const generatePrompt = require('../utils/generatePrompt');
 const openai = require('../openai');
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
 
+// node-fetch çözümü
 const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 globalThis.fetch = fetch;
+
+// Jeton bedeli haritası (ileride veritabanına taşınabilir)
+const jetonBedelleri = {
+  'CV Yazımı': 5,
+  'Marka Tanıtım Sunumu': 3,
+  'Blog Yazısı': 2,
+  'Sosyal Medya Postu': 1,
+  'Akademik Metin': 4,
+  'Reklam': 5
+};
 
 router.post('/', async (req, res) => {
   const {
@@ -13,14 +26,36 @@ router.post('/', async (req, res) => {
     email, phone, languages, certifications, references
   } = req.body;
 
+  // ✅ JWT token kontrolü
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ message: 'Yetkisiz erişim' });
+  }
+
+  const token = authHeader.split(' ')[1];
+
   try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.user.id);
+
+    if (!user) return res.status(404).json({ message: 'Kullanıcı bulunamadı.' });
+
+    // ✅ Jeton ücreti hesapla
+    const jetonBedeli = jetonBedelleri[subCategory] || 1;
+
+    if (user.tokens < jetonBedeli) {
+      return res.status(403).json({
+        message: `Bu içerik için ${jetonBedeli} jeton gerekir. Jetonun yetersiz.`
+      });
+    }
+
+    // ✅ Prompt üretimi
     const userPrompt = generatePrompt({
       name, job, skills, education, experience,
       target, location, category, subCategory, additionalInfo,
       email, phone, languages, certifications, references
     });
 
-    // 👇 Sistem mesajı dinamik olarak belirleniyor
     let systemMessage = '';
 
     if (subCategory === 'Marka Tanıtım Sunumu') {
@@ -54,6 +89,11 @@ router.post('/', async (req, res) => {
       max_tokens: 1000
     });
 
+    // ✅ Jetonu düşür
+    user.tokens -= jetonBedeli;
+    await user.save();
+
+    // ✅ İçeriği döndür
     res.json({ result: completion.choices[0].message.content });
 
   } catch (err) {

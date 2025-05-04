@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 const categories = {
   '🌟 Profesyonel Kariyer İçerikleri': [
@@ -69,7 +69,8 @@ const CategorySidebar = ({
   selectedSubcategory,
   setSelectedSubcategory,
 }) => {
-  const [openCategory, setOpenCategory] = useState(null);
+  const [openCategory, setOpenCategory] = useState(selectedCategory);
+  const categoryRefs = useRef({});
 
   const toggleCategory = (category) => {
     setOpenCategory((prev) => (prev === category ? null : category));
@@ -77,39 +78,25 @@ const CategorySidebar = ({
     setSelectedSubcategory(categories[category][0]);
   };
 
+  useEffect(() => {
+    if (openCategory && categoryRefs.current[openCategory]) {
+      categoryRefs.current[openCategory].scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [openCategory]);
+
   return (
-    <div
-      style={{
-        width: '320px',
-        padding: '1.2rem',
-        borderRight: '1px solid #eee',
-        height: '100vh',
-        overflowY: 'auto',
-        backgroundColor: '#f3fbfa',
-      }}
-    >
+    <div style={styles.sidebar}>
       {Object.entries(categories).map(([category, subcategories]) => (
         <div
           key={category}
-          style={{
-            marginBottom: '16px',
-            backgroundColor: '#ffffff',
-            borderRadius: '12px',
-            boxShadow: '0 1px 6px rgba(0,0,0,0.04)',
-            padding: '14px',
-          }}
+          style={styles.categoryCard}
+          ref={(el) => (categoryRefs.current[category] = el)}
         >
           <div
             onClick={() => toggleCategory(category)}
             style={{
-              color: '#009e8f',
-              cursor: 'pointer',
-              fontSize: '15px',
-              fontWeight: 700,
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: openCategory === category ? '10px' : '0',
+              ...styles.categoryTitle,
+              backgroundColor: openCategory === category ? '#e0f8f5' : '#ffffff',
             }}
           >
             <span>{category}</span>
@@ -117,42 +104,15 @@ const CategorySidebar = ({
           </div>
 
           {openCategory === category && (
-            <ul
-              style={{
-                listStyle: 'none',
-                paddingLeft: 0,
-                display: 'flex',
-                flexWrap: 'wrap',
-                gap: '8px',
-              }}
-            >
+            <ul style={styles.subcategoryList}>
               {subcategories.map((subcat) => (
                 <li
                   key={subcat}
                   onClick={() => setSelectedSubcategory(subcat)}
                   style={{
-                    backgroundColor:
-                      selectedSubcategory === subcat ? '#d0f3ef' : '#f2f2f2',
-                    color:
-                      selectedSubcategory === subcat ? '#009e8f' : '#333',
-                    padding: '6px 10px',
-                    borderRadius: '8px',
-                    cursor: 'pointer',
-                    fontSize: '14px',
-                    fontWeight: 500,
-                    transition: '0.2s',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.backgroundColor =
-                      selectedSubcategory === subcat
-                        ? '#d0f3ef'
-                        : '#e6f7f6';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.backgroundColor =
-                      selectedSubcategory === subcat
-                        ? '#d0f3ef'
-                        : '#f2f2f2';
+                    ...styles.subcategoryItem,
+                    backgroundColor: selectedSubcategory === subcat ? '#d0f3ef' : '#f2f2f2',
+                    color: selectedSubcategory === subcat ? '#009e8f' : '#333',
                   }}
                 >
                   {subcat}
@@ -167,3 +127,52 @@ const CategorySidebar = ({
 };
 
 export default CategorySidebar;
+
+const styles = {
+  sidebar: {
+    width: '100%',
+    maxWidth: '320px',
+    padding: '1.2rem',
+    borderRight: '1px solid #eee',
+    height: '100vh',
+    overflowY: 'auto',
+    backgroundColor: '#f3fbfa',
+    scrollbarWidth: 'thin',
+    scrollbarColor: '#ccc #f3fbfa',
+  },
+  categoryCard: {
+    marginBottom: '16px',
+    backgroundColor: '#ffffff',
+    borderRadius: '12px',
+    boxShadow: '0 1px 6px rgba(0,0,0,0.05)',
+    padding: '10px',
+  },
+  categoryTitle: {
+    color: '#009e8f',
+    cursor: 'pointer',
+    fontSize: '15px',
+    fontWeight: 700,
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '6px',
+    borderRadius: '8px',
+    transition: 'background-color 0.2s',
+  },
+  subcategoryList: {
+    listStyle: 'none',
+    paddingLeft: 0,
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: '6px',
+    marginTop: '10px',
+  },
+  subcategoryItem: {
+    padding: '6px 10px',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    fontSize: '14px',
+    fontWeight: 500,
+    transition: 'background-color 0.2s',
+  },
+};

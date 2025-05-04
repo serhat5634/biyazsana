@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axios from '../axios';  // ✅ Merkezi Axios bağlantısı kullanıldı
 
 const Jetonlarim = () => {
   const [user, setUser] = useState(null);
@@ -16,16 +16,17 @@ const Jetonlarim = () => {
       }
 
       try {
-        const res = await axios.get('/api/users/me', {
+        const res = await axios.get('/users/me', {  // ✅ Axios baseURL ile '/api' eklendi
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
         setUser(res.data);
-        setLoading(false);
       } catch (err) {
-        console.error('Kullanıcı verisi alınamadı');
+        console.error('❌ Kullanıcı verisi alınamadı:', err.message);
         navigate('/login');
+      } finally {
+        setLoading(false);
       }
     };
 

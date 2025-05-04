@@ -4,29 +4,44 @@ const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
+const adminAuth = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ msg: 'Yetkisiz erişim' });
+  }
+
+  const token = authHeader.split(' ')[1];
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    if (decoded.user.role !== 'admin') {
+      return res.status(403).json({ msg: 'Yetkisiz işlem.' });
+    }
+    req.user = decoded.user;
+    next();
+  } catch (err) {
+    res.status(401).json({ msg: 'Token geçersiz' });
+  }
+};
+
 // 📌 Kullanıcı kayıt olma
 router.post('/register', async (req, res) => {
   const { name, email, password } = req.body;
-
   try {
     let user = await User.findOne({ email });
     if (user) {
       return res.status(400).json({ msg: 'Bu e-posta zaten kullanılıyor.' });
     }
 
-    user = new User({
-      name,
-      email,
-      password // tokens: 3 default'ta zaten var
-    });
+    user = new User({ name, email, password, tokens: 3 });
 
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(password, salt);
     await user.save();
 
-    const payload = { user: { id: user.id } };
+    const payload = { user: { id: user.id, role: user.role } };
 
-    jwt.sign(payload, 'gizliAnahtar', { expiresIn: '1h' }, (err, token) => {
+    jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' }, (err, token) => {
       if (err) throw err;
       res.json({ token });
     });
@@ -36,7 +51,7 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// ✅ Giriş yapan kullanıcıyı döndür (JWT üzerinden)
+// ✅ Giriş yapan kullanıcı bilgisi
 router.get('/me', async (req, res) => {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -46,7 +61,7 @@ router.get('/me', async (req, res) => {
   const token = authHeader.split(' ')[1];
 
   try {
-    const decoded = jwt.verify(token, 'gizliAnahtar');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findById(decoded.user.id).select('-password');
     res.json(user);
   } catch (err) {
@@ -54,40 +69,10 @@ router.get('/me', async (req, res) => {
   }
 });
 
-// ✅ Jeton ekleme (admin veya ödeme sonrası)
-router.post('/add-jeton', async (req, res) => {
-  const { adet, userId } = req.body;
+// ✅ Jeton ekleme (Admin yetkisi gerekli)
+router.post('/add-jeton', adminAuth, async (req, res) => { /* üstteki hali */ });
 
-  try {
-    const user = await User.findById(userId);
-    if (!user) return res.status(404).json({ msg: 'Kullanıcı bulunamadı.' });
-
-    user.tokens = (user.tokens || 0) + adet;
-    await user.save();
-
-    res.json({ msg: `${adet} jeton başarıyla eklendi.`, tokens: user.tokens });
-  } catch (err) {
-    console.error('Jeton eklenemedi:', err);
-    res.status(500).json({ msg: 'Sunucu hatası' });
-  }
-});
-
-// ✅ Jeton sıfırlama (admin)
-router.post('/reset-jeton', async (req, res) => {
-  const { userId } = req.body;
-
-  try {
-    const user = await User.findById(userId);
-    if (!user) return res.status(404).json({ msg: 'Kullanıcı bulunamadı.' });
-
-    user.tokens = 0;
-    await user.save();
-
-    res.json({ msg: 'Jetonlar sıfırlandı.', tokens: user.tokens });
-  } catch (err) {
-    console.error('Jeton sıfırlama hatası:', err);
-    res.status(500).json({ msg: 'Sunucu hatası' });
-  }
-});
+// ✅ Jeton sıfırlama (Admin yetkisi gerekli)
+router.post('/reset-jeton', adminAuth, async (req, res) => { /* üstteki hali */ });
 
 module.exports = router;

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import axios from '../axios'; // ✅ doğru merkezi axios dosyasını import et
 import {
   FaInstagram,
   FaTwitter,
@@ -17,7 +17,7 @@ const ReklamVitrini = () => {
   useEffect(() => {
     const fetchAds = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/reklamlar');
+        const res = await axios.get('/reklamlar'); // ✅ sadece endpoint yazılır
 
         // 🔥 Sadece son 3 gün içinde oluşturulanları filtrele
         const now = new Date();
