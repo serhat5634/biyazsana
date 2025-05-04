@@ -39,13 +39,10 @@ const limiter = rateLimit({
 app.use('/api/', limiter);
 
 // 🌐 CORS (Canlı Ortama göre ideal ayar)
-const cors = require('cors');
-
 app.use(cors({
   origin: ['https://biyazsana.com', 'https://www.biyazsana.com'],
   credentials: true,
 }));
-
 
 app.use(express.json());
 
