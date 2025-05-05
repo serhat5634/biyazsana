@@ -115,8 +115,20 @@ function MainPage() {
 
 function App() {
   const location = useLocation();
-  const isAuthenticated = !!sessionStorage.getItem('token');
+  const [isAuthenticated, setIsAuthenticated] = useState(!!sessionStorage.getItem('token'));
   const hideNavbarFooter = location.pathname === '/login';
+
+  // ✅ Google redirect sonrası token yakalama
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
+
+    if (token) {
+      sessionStorage.setItem('token', token);
+      setIsAuthenticated(true);
+      window.history.replaceState({}, '', '/yazi'); // URL'deki token parametresini temizle
+    }
+  }, []);
 
   return (
     <>

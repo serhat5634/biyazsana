@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import axios from '../axios'; // Merkezi axios kullanımı
+import React, { useState, useEffect } from 'react';
+import axios from '../axios';
 import { useNavigate } from 'react-router-dom';
 import './Login.css';
 
@@ -8,6 +8,17 @@ const Login = () => {
   const [form, setForm] = useState({ email: '', password: '', name: '' });
   const [error, setError] = useState('');
   const navigate = useNavigate();
+
+  // ✅ Google redirect sonrası token yakalama
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
+
+    if (token) {
+      sessionStorage.setItem('token', token);
+      window.location.href = '/yazi'; // doğrudan yönlendir
+    }
+  }, []);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
