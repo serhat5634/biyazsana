@@ -49,25 +49,25 @@ const categories = [
   },
 ];
 
-export default function CategorySelector() {
+const CategorySelector = () => {
   const navigate = useNavigate();
-
-  const handleSelect = (id) => {
-    navigate(`/category/${id}`);
-  };
 
   return (
     <div className="p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {categories.map((cat) => (
+      {categories.map((category) => (
         <div
-          key={cat.id}
-          onClick={() => handleSelect(cat.id)}
-          className="cursor-pointer rounded-2xl shadow-lg p-5 border hover:scale-105 transition-all bg-white hover:bg-gray-50"
+          key={category.id}
+          onClick={() => navigate(`/category/${category.id}`)}
+          className="bg-white rounded-2xl shadow-lg p-5 border hover:bg-gray-50 hover:shadow-xl transition-transform cursor-pointer transform hover:scale-105"
         >
-          <h2 className="text-xl font-semibold mb-2">{cat.title}</h2>
-          <p className="text-sm text-gray-600">{cat.description}</p>
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">
+            {category.title}
+          </h2>
+          <p className="text-sm text-gray-600">{category.description}</p>
         </div>
       ))}
     </div>
   );
-}
+};
+
+export default CategorySelector;

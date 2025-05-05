@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from '../axios';
+import axios from '../axios'; // ✅ Merkezi Axios kullanımı netleşti
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -8,14 +8,12 @@ export default function Navbar() {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       if (!token) return;
 
       try {
         const res = await axios.get('/users/me', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
         setUser(res.data);
       } catch (err) {
@@ -27,7 +25,7 @@ export default function Navbar() {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    sessionStorage.removeItem('token');
     setUser(null);
     navigate('/login');
   };

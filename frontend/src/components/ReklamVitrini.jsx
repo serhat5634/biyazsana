@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from '../axios'; // ✅ merkezi axios dosyası kullanılıyor
+import axios from '../axios';
 import {
   FaInstagram,
   FaTwitter,
@@ -17,9 +17,8 @@ const ReklamVitrini = () => {
   useEffect(() => {
     const fetchAds = async () => {
       try {
-        const res = await axios.get('/ads'); // ✅ Güncellendi ve netleştirildi
+        const res = await axios.get('/ads');
 
-        // 🔥 Sadece son 3 gün içinde oluşturulan reklamları filtrele
         const now = new Date();
         const üçGünÖnce = new Date();
         üçGünÖnce.setDate(now.getDate() - 3);
@@ -54,13 +53,13 @@ const ReklamVitrini = () => {
         <div className="reklam-grid">
           {ads.map((ad) => (
             <div key={ad._id} className="reklam-card">
-              <h3>{ad.reklamBasligi}</h3>
+              <h3 className="reklam-card-title">{ad.reklamBasligi}</h3>
 
               <span className={`reklam-badge ${ad.reklamTuru}`}>
                 {ad.reklamTuru === 'product' ? '🌐 Ürün / Site' : '📱 Sosyal Medya'}
               </span>
 
-              <p>{ad.aciklama || '–'}</p>
+              <p className="reklam-description">{ad.aciklama || '–'}</p>
 
               <p className="reklam-date">
                 📅 Yayınlandı:{' '}
@@ -95,6 +94,7 @@ const ReklamVitrini = () => {
                         }
                         target="_blank"
                         rel="noopener noreferrer"
+                        className="social-link"
                       >
                         <Icon /> @{ad[key]}
                       </a>

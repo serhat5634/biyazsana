@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from '../axios'; // ✅ Merkezi axios kullanımı
+import axios from '../axios'; // Merkezi axios kullanımı
 import { useNavigate } from 'react-router-dom';
 import './Login.css';
 
@@ -27,7 +27,7 @@ const Login = () => {
       }
 
       sessionStorage.setItem('token', res.data.token);
-      setForm({ email: '', password: '', name: '' }); // ✅ Form sıfırlandı
+      setForm({ email: '', password: '', name: '' });
       navigate('/yazi');
     } catch (error) {
       const backendMsg = error.response?.data?.msg;
@@ -43,9 +43,11 @@ const Login = () => {
     <div className="login-container">
       <div className="login-card">
         <h2>{isRegister ? 'Kayıt Ol' : 'Giriş Yap'}</h2>
+
         <form onSubmit={handleSubmit}>
           {isRegister && (
             <input
+              className="login-input"
               name="name"
               type="text"
               placeholder="Ad Soyad"
@@ -55,6 +57,7 @@ const Login = () => {
             />
           )}
           <input
+            className="login-input"
             name="email"
             type="email"
             placeholder="E-posta Adresiniz"
@@ -63,6 +66,7 @@ const Login = () => {
             onChange={handleChange}
           />
           <input
+            className="login-input"
             name="password"
             type="password"
             placeholder="Şifreniz"
@@ -73,7 +77,7 @@ const Login = () => {
 
           {error && <p className="error-message">{error}</p>}
 
-          <button type="submit">
+          <button className="login-btn" type="submit">
             {isRegister ? 'Kayıt Ol' : 'Giriş Yap'}
           </button>
 

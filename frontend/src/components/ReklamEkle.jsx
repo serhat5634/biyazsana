@@ -15,7 +15,7 @@ const ReklamEkle = () => {
     youtube: '',
     tiktok: '',
     linkedin: '',
-    facebook: ''
+    facebook: '',
   });
 
   const [message, setMessage] = useState('');
@@ -31,8 +31,13 @@ const ReklamEkle = () => {
     e.preventDefault();
     setMessage('');
 
+    const token = sessionStorage.getItem('token'); // 🔐 Token'i sessionStorage'dan al
+
     try {
-      await axios.post('/ads', form); // ✅ Endpoint güncellendi ve netleştirildi
+      await axios.post('/ads', form, {
+        headers: { Authorization: `Bearer ${token}` }, // 🚀 Token headers'ta net olarak belirtildi
+      });
+
       setMessage('✅ Reklam başarıyla gönderildi!');
       setForm({
         reklamTuru: '',
@@ -44,7 +49,7 @@ const ReklamEkle = () => {
         youtube: '',
         tiktok: '',
         linkedin: '',
-        facebook: ''
+        facebook: '',
       });
     } catch (err) {
       setMessage('❌ Hata: ' + (err.response?.data?.message || err.message));
@@ -52,16 +57,16 @@ const ReklamEkle = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-8 bg-white shadow-xl rounded-xl border border-gray-200">
-      <h2 className="text-2xl font-semibold text-teal-600 mb-6">📢 Reklamını Gönder</h2>
+    <div style={styles.container}>
+      <h2 style={styles.title}>📢 Reklamını Gönder</h2>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit}>
         <select
           name="reklamTuru"
           value={form.reklamTuru}
           onChange={handleChange}
           required
-          className="w-full p-3 rounded-lg border border-gray-300"
+          style={styles.input}
         >
           <option value="">🔽 Reklam Türü Seçiniz</option>
           <option value="product">🚀 Ürün / Site Reklamı</option>
@@ -75,9 +80,9 @@ const ReklamEkle = () => {
             value={form.reklamBasligi}
             onChange={handleChange}
             required
-            className="w-full p-3 rounded-lg border border-gray-300"
+            style={styles.input}
           />
-          <div className="text-right text-sm text-gray-500 mt-1">
+          <div style={styles.charCount}>
             {form.reklamBasligi.length}/{MAX_TITLE} karakter
           </div>
         </div>
@@ -89,9 +94,9 @@ const ReklamEkle = () => {
             value={form.aciklama}
             onChange={handleChange}
             rows={4}
-            className="w-full p-3 rounded-lg border border-gray-300 resize-vertical"
+            style={styles.textarea}
           />
-          <div className="text-right text-sm text-gray-500 mt-1">
+          <div style={styles.charCount}>
             {form.aciklama.length}/{MAX_DESC} karakter
           </div>
         </div>
@@ -103,42 +108,108 @@ const ReklamEkle = () => {
             value={form.link}
             onChange={handleChange}
             required
-            className="w-full p-3 rounded-lg border border-gray-300"
+            style={styles.input}
           />
         )}
 
         {form.reklamTuru === 'social' && (
           <>
-            <input name="instagram" placeholder="📸 Instagram @kullanici" value={form.instagram} onChange={handleChange} className="w-full p-3 rounded-lg border border-gray-300"/>
-            <input name="twitter" placeholder="🐦 Twitter @kullanici" value={form.twitter} onChange={handleChange} className="w-full p-3 rounded-lg border border-gray-300"/>
-            <input name="youtube" placeholder="▶️ YouTube Kanalı Linki" value={form.youtube} onChange={handleChange} className="w-full p-3 rounded-lg border border-gray-300"/>
-            <input name="tiktok" placeholder="🎵 TikTok @kullanici" value={form.tiktok} onChange={handleChange} className="w-full p-3 rounded-lg border border-gray-300"/>
-            <input name="linkedin" placeholder="💼 LinkedIn Linki" value={form.linkedin} onChange={handleChange} className="w-full p-3 rounded-lg border border-gray-300"/>
-            <input name="facebook" placeholder="📘 Facebook Linki" value={form.facebook} onChange={handleChange} className="w-full p-3 rounded-lg border border-gray-300"/>
+            <input name="instagram" placeholder="📸 Instagram @kullanici" value={form.instagram} onChange={handleChange} style={styles.input} />
+            <input name="twitter" placeholder="🐦 Twitter @kullanici" value={form.twitter} onChange={handleChange} style={styles.input} />
+            <input name="youtube" placeholder="▶️ YouTube Kanalı Linki" value={form.youtube} onChange={handleChange} style={styles.input} />
+            <input name="tiktok" placeholder="🎵 TikTok @kullanici" value={form.tiktok} onChange={handleChange} style={styles.input} />
+            <input name="linkedin" placeholder="💼 LinkedIn Linki" value={form.linkedin} onChange={handleChange} style={styles.input} />
+            <input name="facebook" placeholder="📘 Facebook Linki" value={form.facebook} onChange={handleChange} style={styles.input} />
           </>
         )}
 
-        <button
-          type="submit"
-          className="w-full bg-teal-500 text-white py-3 rounded-lg font-semibold hover:bg-teal-600 transition duration-200 shadow"
-        >
+        <button type="submit" style={styles.submitBtn}>
           🚀 Reklamı Gönder
         </button>
       </form>
 
       {message && (
         <div
-          className={`mt-4 text-center p-3 rounded-lg font-medium ${
-            message.startsWith('✅')
-              ? 'bg-green-50 text-green-600'
-              : 'bg-red-50 text-red-600'
-          }`}
+          style={{
+            ...styles.message,
+            ...(message.startsWith('✅') ? styles.successMsg : styles.errorMsg),
+          }}
         >
           {message}
         </div>
       )}
     </div>
   );
+};
+
+const styles = {
+  container: {
+    maxWidth: '600px',
+    margin: '0 auto',
+    padding: '2rem',
+    backgroundColor: '#fff',
+    boxShadow: '0 6px 12px rgba(0,0,0,0.1)',
+    borderRadius: '12px',
+    border: '1px solid #ddd',
+  },
+  title: {
+    fontSize: '24px',
+    fontWeight: 'bold',
+    color: '#00796B',
+    marginBottom: '1.5rem',
+  },
+  input: {
+    width: '100%',
+    padding: '10px 15px',
+    borderRadius: '8px',
+    border: '1px solid #ccc',
+    fontSize: '16px',
+    marginBottom: '10px',
+  },
+  textarea: {
+    width: '100%',
+    padding: '10px 15px',
+    borderRadius: '8px',
+    border: '1px solid #ccc',
+    fontSize: '16px',
+    marginBottom: '10px',
+    resize: 'vertical',
+  },
+  charCount: {
+    textAlign: 'right',
+    color: '#888',
+    fontSize: '13px',
+    marginBottom: '15px',
+  },
+  submitBtn: {
+    width: '100%',
+    padding: '12px',
+    backgroundColor: '#00bfa5',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '8px',
+    fontWeight: 'bold',
+    fontSize: '16px',
+    cursor: 'pointer',
+    transition: 'background-color 0.2s',
+  },
+  message: {
+    marginTop: '15px',
+    textAlign: 'center',
+    padding: '10px',
+    borderRadius: '8px',
+    fontWeight: '500',
+  },
+  successMsg: {
+    backgroundColor: '#e6fffa',
+    color: '#2f855a',
+    border: '1px solid #c6f6d5',
+  },
+  errorMsg: {
+    backgroundColor: '#fff5f5',
+    color: '#c53030',
+    border: '1px solid #fed7d7',
+  },
 };
 
 export default ReklamEkle;

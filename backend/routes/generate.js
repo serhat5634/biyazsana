@@ -5,10 +5,11 @@ const openai = require('../openai');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
-// node-fetch çözümü
+// ✅ node-fetch çözümü (OpenAI istemcisi için gerekli)
 const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 globalThis.fetch = fetch;
 
+// 💸 Jeton bedeli tablosu (geliştirilebilir, veritabanına taşınabilir)
 const jetonBedelleri = {
   'CV Yazımı': 5,
   'Marka Tanıtım Sunumu': 3,
@@ -18,6 +19,7 @@ const jetonBedelleri = {
   'Reklam': 5
 };
 
+// ✨ İçerik oluşturma endpointi (POST /api/generate)
 router.post('/', async (req, res) => {
   const {
     name, job, skills, education, experience,
@@ -42,7 +44,7 @@ router.post('/', async (req, res) => {
 
     if (user.tokens < jetonBedeli) {
       return res.status(403).json({
-        message: `Bu içerik için ${jetonBedeli} jeton gerekiyor ancak jetonun yetersiz.`
+        message: `Bu içerik için ${jetonBedeli} jeton gerekiyor ancak jetonunuz yetersiz.`
       });
     }
 
@@ -79,18 +81,20 @@ router.post('/', async (req, res) => {
       max_tokens: 1000
     });
 
-    if (!completion || !completion.choices || completion.choices.length === 0) {
-      return res.status(500).json({ message: '❌ Yapay zeka içeriği oluşturamadı. Tekrar deneyin.' });
+    const aiContent = completion?.choices?.[0]?.message?.content;
+
+    if (!aiContent) {
+      return res.status(500).json({ message: '❌ Yapay zeka içeriği oluşturulamadı.' });
     }
 
     user.tokens -= jetonBedeli;
     await user.save();
 
-    res.json({ result: completion.choices[0].message.content });
+    res.status(200).json({ result: aiContent });
 
   } catch (err) {
     console.error("🔥 AI veya JWT Hatası:", err);
-    res.status(500).json({ error: "Sunucu hatası: İçerik oluşturulamadı veya token hatalı." });
+    res.status(500).json({ message: "Sunucu hatası: işlem gerçekleştirilemedi." });
   }
 });
 

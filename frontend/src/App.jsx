@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import JetonBasarili from './pages/JetonBasarili';
-import JetonBasarisiz from './pages/JetonBasarisiz';
 
-// 📁 Componentler
+// 📁 Components
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import CategorySidebar from './components/CategorySidebar';
@@ -14,11 +12,8 @@ import ReklamVitrini from './components/ReklamVitrini';
 import ReklamEkle from './components/ReklamEkle';
 import ProtectedRoute from './components/ProtectedRoute';
 import Login from './components/Login';
-import Jetonlarim from './pages/Jetonlarim';
-import JetonAl from './pages/JetonAl';
-import Mesajlarim from './pages/Mesajlarim'; // ✅ Ekledik
 
-// 📄 Sayfalar
+// 📄 Pages
 import AdminPanel from './pages/AdminPanel';
 import Gizlilik from './pages/Gizlilik';
 import Hakkimizda from './pages/Hakkimizda';
@@ -26,15 +21,19 @@ import Iletisim from './pages/Iletisim';
 import IletisimFormu from './pages/IletisimFormu';
 import KullanimKosullari from './pages/KullanimKosullari';
 import SSS from './pages/SSS';
+import Jetonlarim from './pages/Jetonlarim';
+import JetonAl from './pages/JetonAl';
+import Mesajlarim from './pages/Mesajlarim';
+import JetonBasarili from './pages/JetonBasarili';
+import JetonBasarisiz from './pages/JetonBasarisiz';
 
-// 🛠️ Util dosyaları
+// 🛠️ Utilities
 import formFieldsBySubcategory from './utils/formFieldsBySubcategory';
 import { generateContent } from './utils/api';
 
-// 🎨 Stil Dosyaları
+// 🎨 Styles
 import './index.css';
 import './App.css';
-import './components/ReklamVitrini.css';
 
 function MainPage() {
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -61,10 +60,9 @@ function MainPage() {
     setResult('');
 
     try {
-      const cleanedData = {};
-      Object.entries(formData).forEach(([key, value]) => {
-        cleanedData[key] = value.trim();
-      });
+      const cleanedData = Object.fromEntries(
+        Object.entries(formData).map(([k, v]) => [k, v.trim()])
+      );
 
       const res = await generateContent({
         ...cleanedData,
@@ -74,7 +72,7 @@ function MainPage() {
 
       setResult(res.data.result);
     } catch (err) {
-      setResult('❌ Bir hata oluştu: ' + err.message);
+      setResult('❌ Hata oluştu: ' + err.message);
     } finally {
       setLoading(false);
     }
@@ -83,7 +81,7 @@ function MainPage() {
   const currentFields = formFieldsBySubcategory[selectedSubcategory] || [];
 
   return (
-    <div className="App" style={{ display: "flex", minHeight: "100vh" }}>
+    <div className="App" style={{ display: 'flex', minHeight: '100vh' }}>
       <CategorySidebar
         selectedCategory={selectedCategory}
         setSelectedCategory={setSelectedCategory}
@@ -91,7 +89,7 @@ function MainPage() {
         setSelectedSubcategory={setSelectedSubcategory}
       />
 
-      <div style={{ flex: 1, padding: "2rem" }}>
+      <div style={{ flex: 1, padding: '2rem' }}>
         {selectedSubcategory ? (
           <>
             <CategoryForm
@@ -101,18 +99,13 @@ function MainPage() {
               handleSubmit={handleSubmit}
               loading={loading}
             />
-            <Result
-              result={
-                result ||
-                '📭 Henüz bir içerik oluşturulmadı. Yukarıdan bilgileri girip yazdırmayı deneyebilirsin.'
-              }
-            />
+            <Result result={result || '📭 İçerik henüz oluşturulmadı.'} />
           </>
         ) : (
-          <p>Sol taraftan bir kategori seçebilirsin.</p>
+          <p>Sol taraftan kategori seçebilirsin.</p>
         )}
 
-        <div style={{ marginTop: "3rem" }}>
+        <div style={{ marginTop: '3rem' }}>
           <ReklamVitrini />
         </div>
       </div>
@@ -122,16 +115,15 @@ function MainPage() {
 
 function App() {
   const location = useLocation();
-  const token = sessionStorage.getItem('token');
-  const isAuthenticated = !!token;
-  const noNavbarFooter = location.pathname === '/login';
+  const isAuthenticated = !!sessionStorage.getItem('token');
+  const hideNavbarFooter = location.pathname === '/login';
 
   return (
     <>
-      {!noNavbarFooter && isAuthenticated && <Navbar />}
+      {!hideNavbarFooter && isAuthenticated && <Navbar />}
 
       <Routes>
-        <Route path="/" element={isAuthenticated ? <Navigate to="/yazi" /> : <Navigate to="/login" />} />
+        <Route path="/" element={<Navigate to={isAuthenticated ? '/yazi' : '/login'} />} />
         <Route path="/login" element={<Login />} />
         <Route path="/admin" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
         <Route path="/yazi" element={<ProtectedRoute><MainPage /></ProtectedRoute>} />
@@ -141,17 +133,16 @@ function App() {
         <Route path="/hakkimizda" element={<Hakkimizda />} />
         <Route path="/kullanim-kosullari" element={<KullanimKosullari />} />
         <Route path="/sss" element={<SSS />} />
-        <Route path="/jeton-basarili" element={<JetonBasarili />} />
-        <Route path="/jeton-basarisiz" element={<JetonBasarisiz />} />
-        <Route path="/iletisim-detay" element={<Iletisim />} />
         <Route path="/jetonlarim" element={<ProtectedRoute><Jetonlarim /></ProtectedRoute>} />
         <Route path="/jeton-al" element={<ProtectedRoute><JetonAl /></ProtectedRoute>} />
+        <Route path="/jeton-basarili" element={<JetonBasarili />} />
+        <Route path="/jeton-basarisiz" element={<JetonBasarisiz />} />
         <Route path="/reklam" element={<ProtectedRoute><ReklamEkle /></ProtectedRoute>} />
-        <Route path="/mesajlarim" element={<ProtectedRoute><Mesajlarim /></ProtectedRoute>} /> {/* ✅ eklendi */}
+        <Route path="/mesajlarim" element={<ProtectedRoute><Mesajlarim /></ProtectedRoute>} />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
 
-      {!noNavbarFooter && isAuthenticated && <Footer />}
+      {!hideNavbarFooter && isAuthenticated && <Footer />}
     </>
   );
 }

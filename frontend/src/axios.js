@@ -1,15 +1,24 @@
 import axios from 'axios';
 
 const instance = axios.create({
-  baseURL: 'https://biyazsana-backend-1.onrender.com/api', // ✅ Backend URL'si doğru ve net
+  baseURL: 'https://biyazsana-backend-1.onrender.com/api',
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 30000, // ✅ 30 saniyelik timeout değeri ideal
-  withCredentials: true, // ✅ Girişli kullanıcılar için cookie/session taşır
+  timeout: 30000,
+  withCredentials: true,
 });
 
-// 🚨 Merkezi hata yakalayıcı (net hata mesajları)
+// 🔑 Otomatik JWT ekleme (Axios Request Interceptor)
+instance.interceptors.request.use((config) => {
+  const token = sessionStorage.getItem('token'); // token sessionStorage'dan alınır
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+}, (error) => Promise.reject(error));
+
+// 🚨 Merkezi hata yakalayıcı (Axios Response Interceptor)
 instance.interceptors.response.use(
   response => response,
   error => {

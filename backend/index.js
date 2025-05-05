@@ -31,16 +31,20 @@ app.use(compression());
 // 🛡️ Rate Limiter
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100,
+  max: 150,
   message: "⚠️ Çok fazla istek attınız, lütfen biraz bekleyin.",
   standardHeaders: true,
   legacyHeaders: false,
 });
 app.use('/api/', limiter);
 
-// 🌐 CORS ayarı (Canlı ortam için)
+// 🌐 CORS ayarı
 app.use(cors({
-  origin: ['https://biyazsana.com', 'https://www.biyazsana.com'],
+  origin: [
+    'https://biyazsana.com', 
+    'https://www.biyazsana.com',
+    'http://localhost:3000' // geliştirme ortamı
+  ],
   credentials: true,
 }));
 
@@ -48,8 +52,12 @@ app.use(express.json());
 
 // 🌍 MongoDB Bağlantısı
 mongoose.connect(process.env.MONGO_URI, {
-  dbName: 'biyazsana'
-}).then(() => console.log('✅ MongoDB bağlantısı başarılı'))
+  dbName: 'biyazsana',
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  serverSelectionTimeoutMS: 5000
+})
+  .then(() => console.log('✅ MongoDB bağlantısı başarılı'))
   .catch(err => console.error('❌ MongoDB bağlantı hatası:', err));
 
 // 📌 Session Yönetimi
@@ -61,9 +69,13 @@ app.use(session({
     secure: process.env.NODE_ENV === 'production',
     sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     httpOnly: true,
-    maxAge: 1000 * 60 * 60 * 24 * 7
+    maxAge: 7 * 24 * 60 * 60 * 1000
   },
-  store: MongoStore.create({ mongoUrl: process.env.MONGO_URI, dbName: 'biyazsana' })
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGO_URI,
+    dbName: 'biyazsana',
+    collectionName: 'sessions'
+  })
 }));
 
 // 🔑 Passport (Google OAuth)
@@ -72,7 +84,9 @@ app.use(passport.session());
 
 passport.serializeUser((user, done) => done(null, user.id));
 passport.deserializeUser((id, done) => {
-  User.findById(id).then(user => done(null, user)).catch(done);
+  User.findById(id)
+    .then(user => done(null, user))
+    .catch(done);
 });
 
 passport.use(new GoogleStrategy({
@@ -86,8 +100,12 @@ passport.use(new GoogleStrategy({
       user = await User.create({
         name: profile.displayName,
         email: profile.emails[0].value,
-        password: profile.id
+        googleId: profile.id,
+        password: null
       });
+    } else if (!user.googleId) {
+      user.googleId = profile.id;
+      await user.save();
     }
     return done(null, user);
   } catch (err) {
@@ -95,9 +113,9 @@ passport.use(new GoogleStrategy({
   }
 }));
 
-// 🧠 API Route Dosyaları (Güncellendi & Temizlendi)
+// 🧠 API Route Dosyaları
 const generateRoute = require('./routes/generate');
-const adsRoute = require('./routes/ads');               // ✅ Güncellendi
+const adsRoute = require('./routes/ads');
 const contactRoute = require('./routes/contact');
 const mesajlarRoute = require('./routes/mesajlar');
 const authRoute = require('./routes/auth');
@@ -106,7 +124,7 @@ const paytrRoute = require('./routes/paytr');
 
 // 🚀 API Rotaları
 app.use('/api/generate', generateRoute);
-app.use('/api/ads', adsRoute);                          // ✅ Güncellendi
+app.use('/api/ads', adsRoute);
 app.use('/api/contact', contactRoute);
 app.use('/api/mesajlar', mesajlarRoute);
 app.use('/api/auth', authRoute);
