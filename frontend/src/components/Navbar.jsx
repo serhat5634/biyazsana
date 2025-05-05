@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from '../axios'; // ✅ Merkezi Axios kullanımı netleşti
+import axios from '../axios';
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -74,6 +74,15 @@ export default function Navbar() {
           onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#00bfa5')}
         >
           📬 Mesajlarım
+        </button>
+
+        <button
+          onClick={() => navigate('/jeton-al')}
+          style={styles.button}
+          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#1976d2')}
+          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#2196f3')}
+        >
+          💳 Jeton Al
         </button>
 
         {user && (

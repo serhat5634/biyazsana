@@ -1,119 +1,109 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import axios from '../axios';
 
 const JetonAl = () => {
-  const navigate = useNavigate();
-  const [user, setUser] = useState(null);
+  const [amount, setAmount] = useState(5);
+  const [message, setMessage] = useState('');
 
-  const packages = [
-    { id: 1, jeton: 3, price: 42 },
-    { id: 2, jeton: 5, price: 70 },
-    { id: 3, jeton: 10, price: 130 },
-    { id: 4, jeton: 20, price: 240 },
-  ];
+  const paketler = [5, 10, 20, 50]; // Jeton paketleri
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      const token = localStorage.getItem('token');
-      if (!token) return navigate('/login');
-
-      try {
-        const res = await axios.get('/api/users/me', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setUser(res.data);
-      } catch (err) {
-        console.error('Kullanıcı alınamadı');
-        navigate('/login');
-      }
-    };
-
-    fetchUser();
-  }, [navigate]);
-
-  const handlePurchase = async (paket) => {
+  const handlePayment = async () => {
     try {
-      const res = await axios.post('/api/paytr/create-token', {
-        email: user.email,
-        amount: paket.price,
-        userId: user._id,
-        jetonAdet: paket.jeton,
-      });
-
-      const form = document.createElement('form');
-      form.method = 'POST';
-      form.action = 'https://www.paytr.com/odeme';
-
-      for (const key in res.data.tokenParams) {
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = key;
-        input.value = res.data.tokenParams[key];
-        form.appendChild(input);
+      const res = await axios.post('/paytr/token', { amount });
+      if (res.data?.paymentUrl) {
+        window.location.href = res.data.paymentUrl; // PayTR sayfasına yönlendir
+      } else {
+        setMessage('❌ Ödeme bağlantısı oluşturulamadı.');
       }
-
-      document.body.appendChild(form);
-      form.submit(); // 🔁 PayTR ödeme sayfasına yönlendirir
     } catch (err) {
-      console.error('❌ PayTR formu oluşturulamadı:', err);
-      alert('Ödeme başlatılamadı. Lütfen tekrar deneyin.');
+      console.error(err);
+      setMessage('❌ Sunucu hatası. Lütfen tekrar deneyin.');
     }
   };
 
   return (
     <div style={styles.container}>
-      <div style={styles.title}>🎁 Jeton Satın Al</div>
-      <div style={styles.grid}>
-        {packages.map((p) => (
-          <div key={p.id} style={styles.card}>
-            <h3>{p.jeton} Jeton</h3>
-            <p>{p.price} TL</p>
-            <button style={styles.button} onClick={() => handlePurchase(p)}>
-              Satın Al
-            </button>
-          </div>
+      <h2 style={styles.title}>💳 Jeton Satın Al</h2>
+      <p style={styles.desc}>İhtiyacına uygun jeton paketini seçerek işlemini başlatabilirsin.</p>
+
+      <div style={styles.paketGroup}>
+        {paketler.map((paket) => (
+          <button
+            key={paket}
+            onClick={() => setAmount(paket)}
+            style={{
+              ...styles.paketButton,
+              backgroundColor: amount === paket ? '#00bfa5' : '#fff',
+              color: amount === paket ? '#fff' : '#00bfa5',
+              border: '2px solid #00bfa5'
+            }}
+          >
+            {paket} Jeton
+          </button>
         ))}
       </div>
+
+      <button onClick={handlePayment} style={styles.payBtn}>
+        🚀 Satın Al ({amount} Jeton)
+      </button>
+
+      {message && <p style={styles.message}>{message}</p>}
     </div>
   );
 };
 
-export default JetonAl;
-
 const styles = {
   container: {
-    padding: '3rem 1rem',
-    backgroundColor: '#f5f7fa',
-    minHeight: '100vh',
+    maxWidth: '500px',
+    margin: '2rem auto',
+    padding: '2rem',
+    backgroundColor: '#fff',
+    borderRadius: '12px',
+    boxShadow: '0 6px 15px rgba(0,0,0,0.1)',
+    border: '1px solid #ddd',
     textAlign: 'center'
   },
   title: {
-    fontSize: '28px',
-    marginBottom: '2rem',
-    color: '#333'
+    fontSize: '22px',
+    fontWeight: 'bold',
+    color: '#00bfa5',
+    marginBottom: '1rem'
   },
-  grid: {
+  desc: {
+    fontSize: '14px',
+    color: '#555',
+    marginBottom: '1.5rem'
+  },
+  paketGroup: {
     display: 'flex',
-    flexWrap: 'wrap',
+    gap: '12px',
     justifyContent: 'center',
-    gap: '1.5rem'
+    marginBottom: '1.5rem',
+    flexWrap: 'wrap'
   },
-  card: {
-    backgroundColor: '#fff',
-    padding: '1.5rem',
-    borderRadius: '12px',
-    boxShadow: '0 6px 20px rgba(0,0,0,0.1)',
-    width: '200px'
-  },
-  button: {
-    marginTop: '1rem',
-    padding: '10px 16px',
-    backgroundColor: '#00bfa5',
-    color: 'white',
-    border: 'none',
+  paketButton: {
+    padding: '10px 20px',
     borderRadius: '8px',
     fontWeight: 'bold',
+    cursor: 'pointer',
+    minWidth: '100px',
+    fontSize: '16px',
+    transition: 'all 0.2s ease-in-out'
+  },
+  payBtn: {
+    backgroundColor: '#00bfa5',
+    color: '#fff',
+    padding: '12px 24px',
+    border: 'none',
+    borderRadius: '8px',
+    fontSize: '16px',
+    fontWeight: 'bold',
     cursor: 'pointer'
+  },
+  message: {
+    marginTop: '1.5rem',
+    color: '#f44336'
   }
 };
+
+export default JetonAl;
