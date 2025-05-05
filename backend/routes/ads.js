@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const Reklam = require('../models/Ad');
+const Ad = require('../models/Ad');
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 
-const REKLAM_JETON_BEDELI = 5; // Jeton bedeli kolay yönetim için yukarı alındı.
+const REKLAM_JETON_BEDELI = 5; // Jeton bedeli (kolay yönetim)
 
-// 🔽 Yeni reklam oluşturma (POST /api/reklamlar)
+// 🔽 Yeni reklam oluştur (POST /api/ads)
 router.post('/', async (req, res) => {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -27,7 +27,7 @@ router.post('/', async (req, res) => {
       });
     }
 
-    const yeniReklam = new Reklam(req.body);
+    const yeniReklam = new Ad(req.body);
     const kayitliReklam = await yeniReklam.save();
 
     user.tokens -= REKLAM_JETON_BEDELI;
@@ -40,10 +40,10 @@ router.post('/', async (req, res) => {
   }
 });
 
-// 🔼 Tüm reklamları listele (GET /api/reklamlar)
+// 🔼 Tüm reklamları listele (GET /api/ads)
 router.get('/', async (req, res) => {
   try {
-    const reklamlar = await Reklam.find().sort({ createdAt: -1 }).limit(50);
+    const reklamlar = await Ad.find().sort({ createdAt: -1 }).limit(50);
     res.status(200).json(reklamlar);
   } catch (error) {
     console.error('❌ Reklamlar alınırken hata:', error.message);

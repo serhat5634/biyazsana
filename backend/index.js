@@ -20,7 +20,7 @@ const app = express();
 // 🔧 Proxy ayarı (rate limiter için zorunlu)
 app.set('trust proxy', 1);
 
-// 🔐 Güvenlik (Güçlendirilmiş)
+// 🔐 Güvenlik ayarları
 app.use(helmet({
   contentSecurityPolicy: false,
   crossOriginEmbedderPolicy: false,
@@ -38,7 +38,7 @@ const limiter = rateLimit({
 });
 app.use('/api/', limiter);
 
-// 🌐 CORS (Canlı Ortama göre ideal ayar)
+// 🌐 CORS ayarı (Canlı ortam için)
 app.use(cors({
   origin: ['https://biyazsana.com', 'https://www.biyazsana.com'],
   credentials: true,
@@ -46,13 +46,13 @@ app.use(cors({
 
 app.use(express.json());
 
-// 🌍 MongoDB Bağlantısı (güncel)
+// 🌍 MongoDB Bağlantısı
 mongoose.connect(process.env.MONGO_URI, {
   dbName: 'biyazsana'
 }).then(() => console.log('✅ MongoDB bağlantısı başarılı'))
   .catch(err => console.error('❌ MongoDB bağlantı hatası:', err));
 
-// 📌 Express Session (geliştirme ve canlı ortam uyumlu)
+// 📌 Session Yönetimi
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
@@ -95,25 +95,25 @@ passport.use(new GoogleStrategy({
   }
 }));
 
-// 🧠 API Rotaları
+// 🧠 API Route Dosyaları (Güncellendi & Temizlendi)
 const generateRoute = require('./routes/generate');
-const reklamlarRoute = require('./routes/ads');
+const adsRoute = require('./routes/ads');               // ✅ Güncellendi
 const contactRoute = require('./routes/contact');
 const mesajlarRoute = require('./routes/mesajlar');
 const authRoute = require('./routes/auth');
 const usersRoute = require('./routes/users');
 const paytrRoute = require('./routes/paytr');
 
-// 🚀 Rotalar
+// 🚀 API Rotaları
 app.use('/api/generate', generateRoute);
-app.use('/api/reklamlar', reklamlarRoute);
+app.use('/api/ads', adsRoute);                          // ✅ Güncellendi
 app.use('/api/contact', contactRoute);
 app.use('/api/mesajlar', mesajlarRoute);
 app.use('/api/auth', authRoute);
 app.use('/api/users', usersRoute);
 app.use('/api/paytr', paytrRoute);
 
-// 🟢 Sunucu Başlat
+// 🟢 Sunucu Başlatma
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`✅ Backend running on port ${PORT}`);

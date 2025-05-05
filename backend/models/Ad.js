@@ -22,23 +22,14 @@ const reklamSchema = new mongoose.Schema(
       default: '',
       match: [/^(https?:\/\/)?([\w.-]+)+[\w-]+(\.[\w-]+)+(\/[\w- ./?%&=]*)?$/, 'Geçersiz URL formatı'],
     },
-    instagram: {
-      type: String,
-      default: '',
-    },
-    twitter: {
-      type: String,
-      default: '',
-    },
+    instagram: { type: String, default: '' },
+    twitter: { type: String, default: '' },
     youtube: {
       type: String,
       default: '',
       match: [/^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$/, 'Geçersiz YouTube linki'],
     },
-    tiktok: {
-      type: String,
-      default: '',
-    },
+    tiktok: { type: String, default: '' },
     linkedin: {
       type: String,
       default: '',
@@ -55,4 +46,4 @@ const reklamSchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model('Reklam', reklamSchema);
+module.exports = mongoose.model('Ad', reklamSchema); // ✅ DÜZELTİLMİŞ VE NET

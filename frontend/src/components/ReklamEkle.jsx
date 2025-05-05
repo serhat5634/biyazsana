@@ -32,7 +32,7 @@ const ReklamEkle = () => {
     setMessage('');
 
     try {
-      await axios.post('/api/reklamlar', form);
+      await axios.post('/ads', form); // ✅ Endpoint güncellendi ve netleştirildi
       setMessage('✅ Reklam başarıyla gönderildi!');
       setForm({
         reklamTuru: '',
@@ -56,7 +56,13 @@ const ReklamEkle = () => {
       <h2 className="text-2xl font-semibold text-teal-600 mb-6">📢 Reklamını Gönder</h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <select name="reklamTuru" value={form.reklamTuru} onChange={handleChange} required className="w-full p-3 rounded-lg border border-gray-300">
+        <select
+          name="reklamTuru"
+          value={form.reklamTuru}
+          onChange={handleChange}
+          required
+          className="w-full p-3 rounded-lg border border-gray-300"
+        >
           <option value="">🔽 Reklam Türü Seçiniz</option>
           <option value="product">🚀 Ürün / Site Reklamı</option>
           <option value="social">📱 Sosyal Medyada Kendini Tanıt</option>
@@ -112,13 +118,22 @@ const ReklamEkle = () => {
           </>
         )}
 
-        <button type="submit" className="w-full bg-teal-500 text-white py-3 rounded-lg font-semibold hover:bg-teal-600 transition duration-200 shadow">
+        <button
+          type="submit"
+          className="w-full bg-teal-500 text-white py-3 rounded-lg font-semibold hover:bg-teal-600 transition duration-200 shadow"
+        >
           🚀 Reklamı Gönder
         </button>
       </form>
 
       {message && (
-        <div className={`mt-4 text-center p-3 rounded-lg font-medium ${message.startsWith('✅') ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
+        <div
+          className={`mt-4 text-center p-3 rounded-lg font-medium ${
+            message.startsWith('✅')
+              ? 'bg-green-50 text-green-600'
+              : 'bg-red-50 text-red-600'
+          }`}
+        >
           {message}
         </div>
       )}

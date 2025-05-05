@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from '../axios'; // ✅ doğru merkezi axios dosyasını import et
+import axios from '../axios'; // ✅ merkezi axios dosyası kullanılıyor
 import {
   FaInstagram,
   FaTwitter,
@@ -17,14 +17,16 @@ const ReklamVitrini = () => {
   useEffect(() => {
     const fetchAds = async () => {
       try {
-        const res = await axios.get('/reklamlar'); // ✅ sadece endpoint yazılır
+        const res = await axios.get('/ads'); // ✅ Güncellendi ve netleştirildi
 
-        // 🔥 Sadece son 3 gün içinde oluşturulanları filtrele
+        // 🔥 Sadece son 3 gün içinde oluşturulan reklamları filtrele
         const now = new Date();
         const üçGünÖnce = new Date();
         üçGünÖnce.setDate(now.getDate() - 3);
 
-        const filtreliReklamlar = res.data.filter(ad => new Date(ad.createdAt) >= üçGünÖnce);
+        const filtreliReklamlar = res.data.filter(
+          (ad) => new Date(ad.createdAt) >= üçGünÖnce
+        );
 
         setAds(filtreliReklamlar);
       } catch (err) {
@@ -60,16 +62,15 @@ const ReklamVitrini = () => {
 
               <p>{ad.aciklama || '–'}</p>
 
-              {/* 📅 Yayın Tarihi */}
               <p className="reklam-date">
-                📅 Yayınlandı: {new Date(ad.createdAt).toLocaleDateString('tr-TR', {
+                📅 Yayınlandı:{' '}
+                {new Date(ad.createdAt).toLocaleDateString('tr-TR', {
                   day: '2-digit',
                   month: 'long',
-                  year: 'numeric'
+                  year: 'numeric',
                 })}
               </p>
 
-              {/* Ürün/Site linki */}
               {ad.reklamTuru === 'product' && ad.link && (
                 <a
                   href={ad.link}
@@ -81,7 +82,6 @@ const ReklamVitrini = () => {
                 </a>
               )}
 
-              {/* Sosyal medya linkleri */}
               {ad.reklamTuru === 'social' && (
                 <div className="social-links">
                   {Object.entries(socialIcons).map(([key, Icon]) =>
@@ -89,7 +89,7 @@ const ReklamVitrini = () => {
                       <a
                         key={key}
                         href={
-                          key === 'youtube' || key === 'linkedin' || key === 'facebook'
+                          ['youtube', 'linkedin', 'facebook'].includes(key)
                             ? ad[key]
                             : `https://${key}.com/${ad[key]}`
                         }
